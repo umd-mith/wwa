@@ -9,11 +9,12 @@
         This is namespace agnostic: only local-names are checked.
     -->
     
-    <xsl:param name="elements" select="('pb', 'cb')">
+    <!-- Because these XSLTs are part of an XProc pipe, parameters will always be strings. -->
+    <xsl:param name="elements" select="'pb,cb'">
         <!-- 
             Accepted values:
-            * string 'all' -> Generates IDs for all elements without one.
-            * XPath list of strings ('pb', 'cb') -> Generates IDs for all elements with listed local-name.
+            * 'all' -> Generates IDs for all elements without one.
+            * comma-separated elements 'pb,cb' -> Generates IDs for all elements with listed local-name.
         -->
     </xsl:param>
     
@@ -32,7 +33,7 @@
         </xsl:copy>        
     </xsl:template>
     
-    <xsl:template match='element()[not(@xml:id)][local-name()=$elements]'>   
+    <xsl:template match="element()[not(@xml:id)][local-name()=tokenize($elements, ',')]">   
         <xsl:copy>
             <xsl:attribute name="xml:id" select="generate-id()"/>
             <xsl:apply-templates select='@*|node()'/>
