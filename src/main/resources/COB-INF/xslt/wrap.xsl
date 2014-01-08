@@ -11,10 +11,8 @@
     <xsl:param name="mil" select="'pb'"/>
     <xsl:param name="wrapper" select="'surface'"/>
     <xsl:param name="attrs">
-        <!--
-            <key>key1</key><value>value1</value>
-            <key>key2</key><value>value2</value>
-            etc.
+        <!-- Key value pairs in string, like so:
+            'key|value,key|value' etc.
         -->
     </xsl:param>
     
@@ -29,9 +27,10 @@
         <xsl:element name="{$wrapper}" namespace="http://www.tei-c.org/ns/1.0">
             <xsl:sequence select="*[local-name()=$mil]/@* except *[local-name()=$mil]/@n_added"/>
             <xsl:if test="$attrs != ''">
-                <xsl:for-each select="$attrs//key">
-                    <xsl:attribute name="{.}">
-                        <xsl:value-of select="following-sibling::value[1]"/>
+                <xsl:for-each select="tokenize($attrs, ',')">
+                    <xsl:variable name="pair" select="tokenize(current(), '\|')"/>
+                    <xsl:attribute name="{$pair[1]}">
+                        <xsl:value-of select="$pair[2]"/>
                     </xsl:attribute>
                 </xsl:for-each>
             </xsl:if>
