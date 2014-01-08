@@ -11,15 +11,25 @@
     
     <xsl:template match="/">
         
-        <grp>
-            <xsl:for-each select="//*[local-name()=$splitEl]">
-                <xsl:variable name="cur_num"><xsl:number count="//*[local-name()=$splitEl]" level="any"/></xsl:variable>
-                <xsl:call-template name="wrap">
-                    <xsl:with-param name="splitEl" select="'pb'"/>
-                    <xsl:with-param name="pgNum" select="string($cur_num)"/>
-                </xsl:call-template>
-            </xsl:for-each>
-        </grp>
+        <TEI xmlns="http://www.tei-c.org/ns/1.0">
+            <xsl:sequence select="//tei:TEI/@*"/>
+            <xsl:sequence select="//tei:teiHeader"/>
+            <text xmlns="http://www.tei-c.org/ns/1.0">
+                <xsl:sequence select="//tei:text/@*"/>
+                <body xmlns="http://www.tei-c.org/ns/1.0">
+                    <xsl:sequence select="//tei:body/@*"/>
+                    
+                    <xsl:for-each select="//*[local-name()=$splitEl]">
+                        <xsl:variable name="cur_num"><xsl:number count="//*[local-name()=$splitEl]" level="any"/></xsl:variable>
+                        <xsl:call-template name="wrap">
+                            <xsl:with-param name="splitEl" select="'pb'"/>
+                            <xsl:with-param name="pgNum" select="string($cur_num)"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                    
+                </body>
+            </text>            
+        </TEI>
         
     </xsl:template>
     
