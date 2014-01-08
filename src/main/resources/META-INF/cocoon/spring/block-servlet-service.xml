@@ -24,8 +24,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                            http://cocoon.apache.org/schema/servlet http://cocoon.apache.org/schema/servlet/cocoon-servlet-1.0.xsd">
 
-  <bean name="org.mith.readingTEI.service" class="org.apache.cocoon.sitemap.SitemapServlet">
-    <servlet:context mount-path="/" context-path="blockcontext:/readingTEI/"/>
+  <bean name="org.mith.wwa.service" class="org.apache.cocoon.sitemap.SitemapServlet">
+    <servlet:context mount-path="/" context-path="blockcontext:/wwa/"/>
   </bean>
 
 </beans>
