@@ -42,7 +42,7 @@
 
   <map:pipelines>
 
-    <map:pipeline id="wwa-internal"> <!--internal-only="true"-->
+    <map:pipeline id="utils" internal-only="true">
 
       <map:match pattern="fixns/*">
         <map:generate src="xml/received/{1}"/>
@@ -58,22 +58,39 @@
         <map:serialize type="xml"/>
       </map:match>
       
-      <map:match pattern="split/*/*">
-        <map:generate src="cocoon:/ids/{1}.xml"/>
-        <map:transform src="xslt/splitter.xsl" type="saxon">
-          <map:parameter name="splitEl" value="{2}"/>
+      <map:match pattern="surfaces/*">
+        <map:generate src="cocoon:/fixns/{1}.xml"/>
+        <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
+          <map:parameter name="milestone" value="pb"/>
+          <map:parameter name="wrapper" value="surface"/>
         </map:transform>
         <map:serialize type="xml"/>
       </map:match>
       
-    </map:pipeline>
+      <map:match pattern="zones/*">
+        <map:generate src="cocoon:/surfaces/{1}"/>
+        <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
+          <map:parameter name="milestone" value="cb"/>
+          <map:parameter name="wrapper" value="zone"/>
+          <map:parameter name="wrapper_parent" value="surface"/>
+        </map:transform>
+        <map:serialize type="xml"/>
+      </map:match>
+      
+      <map:match pattern="_convert/*">
+        <map:generate src="cocoon:/zones/{1}"/>
+        <map:transform src="xslt/text2sourceDoc.xsl" type="saxon"/>
+        <map:serialize type="xml"/>
+      </map:match>
+      
+    </map:pipeline>    
 
     <map:pipeline id="wwa">
 
       <map:match pattern="convert/*">
-        <map:generate src="cocoon:/split/{1}/pb"/>
+        <map:generate src="cocoon:/_convert/{1}"/>
         <map:serialize type="xml"/>
-      </map:match>      
+      </map:match> 
       
     </map:pipeline>
 
