@@ -1,15 +1,14 @@
-WWA
-===
-
-MITH's development for the Walter Whitman Archive project.
-
-For now, this repository only contains XSLT code to manipulate WWA TEI documents for display through the SGA Shared Canvas viewer (https://github.com/umd-mith/sga/tree/master/shared-canvas)
-
 # WWA
 
 MITH's development for the Walter Whitman Archive project.
 
-This is a Cocoon 2.2 block to manipualte WWA TEI documents for display through the SGA Shared Canvas viewer (https://github.com/umd-mith/sga/tree/master/shared-canvas)
+## ODD
+
+This repo holds the ODD and its derivatives for a document-focused transformation of the text-focused WWA TEI.
+
+## Cocoon block
+
+This repo includes a Cocoon 2.2 block to manipualte WWA TEI documents for display through the SGA Shared Canvas viewer (https://github.com/umd-mith/sga/tree/master/shared-canvas)
 
 # Compiling the block and webapp
 
