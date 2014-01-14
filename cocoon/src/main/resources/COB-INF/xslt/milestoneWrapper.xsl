@@ -58,7 +58,7 @@ Apache 2.0 license: http://www.apache.org/licenses/LICENSE-2.0.html
       <xsl:sequence select="current-group()[empty($copying)]"/>
       <xsl:for-each select="$copying">
         <xsl:copy>
-          <xsl:copy-of select="@* except @xml:id"/>
+          <xsl:copy-of select="@*"/>
           <xsl:call-template name="build">
             <xsl:with-param name="level" select="$level + 1"/>
           </xsl:call-template>
