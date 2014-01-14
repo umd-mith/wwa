@@ -10,7 +10,7 @@ This repo holds the ODD and its derivatives for a document-focused transformatio
 
 This repo includes a Cocoon 2.2 block to manipualte WWA TEI documents for display through the SGA Shared Canvas viewer (https://github.com/umd-mith/sga/tree/master/shared-canvas)
 
-# Compiling the block and webapp
+### Compiling the block and webapp
 
 To compile the block so that it can be used in a webapp, run:
 
