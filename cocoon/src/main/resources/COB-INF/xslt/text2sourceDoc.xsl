@@ -15,13 +15,22 @@
         </xsl:copy>
     </xsl:template>
     
+    <!-- TOP LEVEL transformations -->
+    
     <xsl:template match="tei:text">
         <sourceDoc xmlns="http://www.tei-c.org/ns/1.0" wwa:was="tei:text">
             <xsl:apply-templates select="@*|node()"/>
         </sourceDoc>
     </xsl:template>
     
-    <xsl:template match="tei:p[ancestor::tei:text] | tei:l[ancestor::tei:text]">
+    <xsl:template match="tei:body">
+            <xsl:apply-templates select="@*|node()"/>        
+    </xsl:template>
+    
+    <!-- TEXT- to DOCUMENT-FOCUSED transformations -->
+    
+    <!-- Line-level elements -->
+    <xsl:template match="tei:item[ancestor::tei:text] | tei:p[ancestor::tei:text] | tei:l[ancestor::tei:text]">
         <line xmlns="http://www.tei-c.org/ns/1.0" wwa:was="tei:{local-name()}">
             <xsl:apply-templates select="@*|node()"/>
         </line>
@@ -34,17 +43,26 @@
         </seg>
     </xsl:template>
     
+    <!-- subst to mod -->
+    <xsl:template match="tei:subst">
+        <mod xmlns="http://www.tei-c.org/ns/1.0" wwa:was="tei:subst">
+            <xsl:apply-templates select="@*|node()"/>
+        </mod>
+    </xsl:template>
+    
     <!-- generalize semantics -->
-    <xsl:template match="tei:lg[ancestor::tei:text] | tei:q[ancestor::tei:text] | tei:fw[ancestor::tei:text] | tei:ab[ancestor::tei:text]">
+    <xsl:template match="tei:div[ancestor::tei:text] | tei:div1[ancestor::tei:text] | tei:list[ancestor::tei:text] | tei:head[ancestor::tei:text] | tei:lg[ancestor::tei:text] | tei:q[ancestor::tei:text] | tei:fw[ancestor::tei:text] | tei:ab[ancestor::tei:text]">
         <zone xmlns="http://www.tei-c.org/ns/1.0" type="logical">          
             <xsl:attribute name="wwa:was">
                 <xsl:value-of select="concat('tei:', local-name())"/>
-            </xsl:attribute>   
-            <xsl:attribute name="wwa:attrs">
-                <xsl:for-each select="@* except @xml:id except @type">
-                    <xsl:value-of select="concat(local-name(),':',.,',')"/>
-                </xsl:for-each>
             </xsl:attribute>
+            <xsl:if test="count(@* except @xml:id except @type) > 0">
+                <xsl:attribute name="wwa:attrs">
+                    <xsl:for-each select="@* except @xml:id except @type">
+                        <xsl:value-of select="concat(local-name(),':',.,',')"/>
+                    </xsl:for-each>
+                </xsl:attribute>
+            </xsl:if>
             <xsl:if test="@type">
                 <xsl:attribute name="subtype">
                     <xsl:value-of select="@type"/>
@@ -72,7 +90,9 @@
         </add>
     </xsl:template>
     
-    <!-- cleanup empty blocks form previous transforms -->
+    <!-- CLEANUP and ADJUSTMENTS from previous transformations -->
+    
+    <!-- cleanup empty blocks -->
     <xsl:template match="tei:surface[count(*)=1][tei:zone[not(*) and not(text()[normalize-space()])]]"/>
     
     <xsl:template match="tei:pb | tei:cb"/>
@@ -118,6 +138,14 @@
             </xsl:choose>            
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>        
+    </xsl:template>
+    
+    <!-- when there are no columns, make the only zone a "main" zone -->
+    <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)]">
+        <xsl:copy>
+            <xsl:attribute name="type">main</xsl:attribute>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
     </xsl:template>
     
 </xsl:stylesheet>
