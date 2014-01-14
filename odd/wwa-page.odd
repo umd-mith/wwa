@@ -455,6 +455,7 @@
                     <classSpec ident="att.responsibility" type="atts" mode="delete"/>
 
                     <elementSpec ident="surface" module="transcr" mode="change">
+                        <!-- Added for WWA -->
                         <classes mode="change">
                             <memberOf key="att.wwa.legacy" mode="add"/>
                         </classes>
@@ -512,6 +513,7 @@
                         expect this to be fixed in a future release of the Guidelines, 
                         see http://tei-l.970651.n3.nabble.com/Content-model-of-lt-line-gt-td3647279.html -->
                     <elementSpec ident="line" module="transcr" mode="change">
+                        <!-- Added for WWA -->
                         <classes mode="change">
                             <memberOf key="att.wwa.legacy" mode="add"/>
                         </classes>
@@ -610,8 +612,8 @@
                                     <valItem ident="alternative"/>
                                 </valList>
                             </attDef>
-                            <attDef ident="rend" mode="delete"/>
-                            
+                            <!-- Restored for WWA -->
+                            <!--<attDef ident="rend" mode="delete"/>-->                            
                         </attList>
                     </elementSpec>
 
@@ -646,7 +648,8 @@
 
                     <elementSpec ident="milestone" module="core" mode="change">
                         <attList>
-                            <attDef ident="unit" mode="replace" usage="req">
+                            <!-- Relaxed restrictions on unit value for WWA -->
+                            <!--<attDef ident="unit" mode="replace" usage="req">
                                 <valList type="closed" mode="replace">
                                     <valItem ident="tei:div"/>
                                     <valItem ident="tei:p"/>
@@ -658,11 +661,12 @@
                                     <valItem ident="tei:seg"/>
                                     <valItem ident="tei:note"/>
                                 </valList>
-                            </attDef>
+                            </attDef>-->
                         </attList>
                     </elementSpec>
 
                     <elementSpec ident="zone" module="transcr" mode="change">
+                        <!-- Added for WWA -->
                         <classes mode="change">
                             <memberOf key="att.wwa.legacy" mode="add"/>
                         </classes>
@@ -755,6 +759,10 @@
                     </elementSpec>
 
                     <elementSpec ident="mod" module="transcr" mode="change">
+                        <!-- Added for WWA -->
+                        <classes mode="change">
+                            <memberOf key="att.wwa.legacy" mode="add"/>
+                        </classes>
                         <content>
                             <!-- mod must have only element children so the below is a subset of macro.paraContent -->
                             <rng:zeroOrMore>
@@ -830,6 +838,7 @@
                     </elementSpec>
                     
                     <elementSpec module="linking" ident="seg" mode="change">
+                        <!-- added for WWA -->
                         <classes mode="change">
                             <memberOf key="att.wwa.legacy" mode="add"/>
                         </classes>
