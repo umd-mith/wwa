@@ -69,6 +69,7 @@
       
       <map:match pattern="zones/*">
         <map:generate src="cocoon:/surfaces/{1}"/>
+        <!-- NB this doubles as a "main" zone wrapper when cb is absent -->
         <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
           <map:parameter name="milestone" value="cb"/>
           <map:parameter name="wrapper" value="zone"/>
