@@ -30,10 +30,65 @@
     <!-- TEXT- to DOCUMENT-FOCUSED transformations -->
     
     <!-- Line-level elements -->
-    <xsl:template match="tei:item[ancestor::tei:text] | tei:p[ancestor::tei:text] | tei:l[ancestor::tei:text]">
-        <line xmlns="http://www.tei-c.org/ns/1.0" wwa:was="tei:{local-name()}">
+    <xsl:template match="tei:item[ancestor::tei:text] | tei:l[ancestor::tei:text]">
+        <line xmlns="http://www.tei-c.org/ns/1.0">
             <xsl:apply-templates select="@*|node()"/>
         </line>
+    </xsl:template>
+    
+    <xsl:template match="tei:p[ancestor::tei:text] | tei:q[ancestor::tei:text] | tei:ab[ancestor::tei:text]">
+        
+        <!--<xsl:variable name="nodes">
+            <xsl:for-each select="node()">
+                <xsl:choose>
+                    <xsl:when test="self::text()">
+                        <xsl:variable name="tot" select="count(tokenize(., '\n'))"/>
+                        <xsl:for-each select="tokenize(., '\n')">
+                            <text_node xmlns="http://www.whitmanarchive.org/namespace">
+                                <xsl:if test="position()=1">
+                                    <xsl:attribute name="first">y</xsl:attribute>
+                                </xsl:if>
+                                <xsl:if test="position()=$tot">
+                                    <xsl:attribute name="last">y</xsl:attribute>
+                                </xsl:if>
+                                <xsl:value-of select="."/>
+                            </text_node>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="."/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:variable>-->
+        
+        
+        <xsl:variable name="anchor_id" select="generate-id()"/>
+        <milestone xmlns="http://www.tei-c.org/ns/1.0" unit="tei:{local-name()}" spanTo="#{$anchor_id}"/>
+        
+        <xsl:apply-templates select="node()"/>
+        
+        <!--<xsl:for-each-group select="$nodes/*" group-starting-with="wwa:text_node[@last]">
+            <xsl:for-each-group select="current-group()" group-ending-with="wwa:text_node[@first] | wwa:text_node[not(@first)][not(@last)]">
+                <xsl:choose>
+                    <xsl:when test="self::q[contains(., '\n')]">
+                        <xsl:apply-templates/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="not(self::wwa:text_node[normalize-space()=''])">
+                            <line xmlns="http://www.tei-c.org/ns/1.0" y="y">
+                                <xsl:for-each select="current-group()">                        
+                                    <xsl:sequence select="if (self::wwa:text_node) then text() else ."/>
+                                </xsl:for-each>                    
+                            </line>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>                
+            </xsl:for-each-group>            
+        </xsl:for-each-group>-->
+        
+        <anchor xmlns="http://www.tei-c.org/ns/1.0" xml:id="{$anchor_id}"/>
+        
     </xsl:template>
     
     <!-- For now, we flatten choices -->
@@ -51,25 +106,22 @@
     </xsl:template>
     
     <!-- generalize semantics -->
-    <xsl:template match="tei:div[ancestor::tei:text] | tei:div1[ancestor::tei:text] | tei:list[ancestor::tei:text] | tei:head[ancestor::tei:text] | tei:lg[ancestor::tei:text] | tei:q[ancestor::tei:text] | tei:fw[ancestor::tei:text] | tei:ab[ancestor::tei:text]">
-        <zone xmlns="http://www.tei-c.org/ns/1.0" type="logical">          
-            <xsl:attribute name="wwa:was">
-                <xsl:value-of select="concat('tei:', local-name())"/>
-            </xsl:attribute>
-            <xsl:if test="count(@* except @xml:id except @type) > 0">
+    <xsl:template match="tei:div[ancestor::tei:text] | tei:div1[ancestor::tei:text] | tei:list[ancestor::tei:text] | tei:head[ancestor::tei:text] | tei:lg[ancestor::tei:text] | tei:fw[ancestor::tei:text]">
+        <xsl:variable name="anchor_id" select="generate-id()"/>
+        <milestone xmlns="http://www.tei-c.org/ns/1.0" unit="tei:{local-name()}" spanTo="#{$anchor_id}">
+            <xsl:if test="count(@* except @xml:id) > 0">
                 <xsl:attribute name="wwa:attrs">
-                    <xsl:for-each select="@* except @xml:id except @type">
+                    <xsl:for-each select="@* except @xml:id">
                         <xsl:value-of select="concat(local-name(),':',.,',')"/>
                     </xsl:for-each>
                 </xsl:attribute>
-            </xsl:if>
-            <xsl:if test="@type">
-                <xsl:attribute name="subtype">
-                    <xsl:value-of select="@type"/>
-                </xsl:attribute>
-            </xsl:if>
-            <xsl:apply-templates select="@xml:id|node()"/>
-        </zone>
+            </xsl:if>  
+            <xsl:apply-templates select="@xml:id"/>
+        </milestone>    
+        <xsl:apply-templates select="node()"/>
+        
+        <anchor xmlns="http://www.tei-c.org/ns/1.0" xml:id="{$anchor_id}"/>
+        
     </xsl:template>
     
     <!-- Make spans into metamarks -->
