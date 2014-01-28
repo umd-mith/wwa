@@ -31,7 +31,7 @@
     
     <!-- Line-level elements -->
     <xsl:template match="tei:item[ancestor::tei:text] | tei:l[ancestor::tei:text]">
-        <line xmlns="http://www.tei-c.org/ns/1.0">
+        <line xmlns="http://www.tei-c.org/ns/1.0" rend="indent1">
             <xsl:apply-templates select="@*|node()"/>
         </line>
     </xsl:template>
@@ -199,5 +199,9 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
+    
+    <xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:lb]"/>
+    
+    <xsl:template match="tei:lb[not(ancestor::tei:zone)]"/>
     
 </xsl:stylesheet>
