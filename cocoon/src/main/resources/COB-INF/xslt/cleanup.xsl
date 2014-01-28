@@ -27,4 +27,6 @@
     <xsl:apply-templates select="node()"/>
   </xsl:template>
   
+  <xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:zone[normalize-space()='']]"/>
+  
 </xsl:stylesheet>
