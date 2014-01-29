@@ -86,7 +86,11 @@
       
       <map:match pattern="lines/*">
         <map:generate src="cocoon:/_convert/{1}"/>
-        <map:transform src="xslt/lbWrapper.xsl" type="saxon"/>
+        <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
+          <map:parameter name="milestone" value="lb"/>
+          <map:parameter name="wrapper" value="line"/>
+          <map:parameter name="wrapper_parent" value="zone"/>
+        </map:transform>
         <map:serialize type="xml"/>
       </map:match>
       
