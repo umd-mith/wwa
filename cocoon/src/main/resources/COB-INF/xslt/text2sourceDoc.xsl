@@ -188,9 +188,10 @@
                     <xsl:attribute name="type"><xsl:text>top</xsl:text></xsl:attribute>
                 </xsl:when>
             </xsl:choose>            
-            <line xmlns="http://www.tei-c.org/ns/1.0"><xsl:apply-templates select="@*|node() except tei:lb"/></line>
+            <line xmlns="http://www.tei-c.org/ns/1.0"><xsl:apply-templates select="@*|node()"/></line>
         </xsl:copy>        
     </xsl:template>
+    <xsl:template match="tei:lb[ancestor::tei:zone[descendant::tei:fw]]"/>
     
     <!-- when there are no columns, make the only zone a "main" zone -->
     <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)]">
