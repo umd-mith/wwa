@@ -168,7 +168,7 @@
         
     <!-- match the first column, replace it with a wrapper and pull in the following siblings -->
     <xsl:template match="tei:zone[descendant::tei:cb][1]">
-        <zone type="main" xmlns="http://www.tei-c.org/ns/1.0">
+        <!--<zone type="main" xmlns="http://www.tei-c.org/ns/1.0">-->
             <xsl:for-each select="self::* | following-sibling::tei:zone[descendant::tei:cb]">
                 <xsl:copy>
                     <xsl:attribute name="wwa:was"><xsl:text>tei:cb</xsl:text></xsl:attribute>
@@ -176,7 +176,7 @@
                     <xsl:apply-templates select="@*|node()"/>
                 </xsl:copy>
             </xsl:for-each>            
-        </zone>        
+        <!--</zone>-->        
     </xsl:template>
     <!-- Ignore the following columns -->
     <xsl:template match="tei:zone[descendant::tei:cb][preceding-sibling::tei:zone[descendant::tei:cb]]"/>
@@ -188,7 +188,7 @@
                     <xsl:attribute name="type"><xsl:text>top</xsl:text></xsl:attribute>
                 </xsl:when>
             </xsl:choose>            
-            <xsl:apply-templates select="@*|node()"/>
+            <line xmlns="http://www.tei-c.org/ns/1.0"><xsl:apply-templates select="@*|node() except tei:lb"/></line>
         </xsl:copy>        
     </xsl:template>
     
