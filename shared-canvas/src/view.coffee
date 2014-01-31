@@ -411,16 +411,22 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           @currentLineEl.append textAnnoView.render()?.el
         #TODO: when "sgaAdditionAnnotation"
         when "LineBreak" in type
-          # new line container
-          @currentLineEl = $("<div></div>")
-          @$el.append @currentLineEl
 
+          # Before creating a new line container, add other classes on the current one.
+          # For example, alignment and indentation are stored on the line break annotation
+          # and must be processed now.
           if model.get("align")?
               @currentLineEl.css
                 'text-align': model.get("align")
-            if model.get("indent")?
-              @currentLineEl.css
-                'padding-left': (Math.floor(model.get("indent")) or 0)+"em"
+          if model.get("indent")?
+            @currentLineEl.css
+              'padding-left': (Math.floor(model.get("indent")) or 0)+"em"
+
+          # Only now overwrite the @currentLineEl variable
+          # and add a new line container that will be populated at the next run of addOne()
+          @currentLineEl = $("<div></div>")
+          @$el.append @currentLineEl
+          
 
     render: ->
       @variables.on 'change:width', (w) ->
@@ -469,6 +475,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @$el.css 'display', 'inline-block'
       @$el.text @model.get "text"
       @$el.addClass @model.get("type").join(" ")
+
+      if @model.get("align")?
+          @$el.css
+            'text-align': @model.get("align")
+      if @model.get("indent")?
+        @$el.css
+          'padding-left': (Math.floor(@model.get("indent")) or 0)+"em"
 
       icss = @model.get "css"
       if icss? and not /^\s*$/.test(icss) then @$el.attr "style", icss
