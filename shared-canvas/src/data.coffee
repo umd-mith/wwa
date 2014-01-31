@@ -258,6 +258,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
     extractTextTarget = (model, id) ->
       return unless id?
       target = graph[id]
+      #console.log model, target
       if "oa:SpecificResource" in SGASharedCanvas.Utils.makeArray(target["@type"])
         model.set
           target : target["full"]
@@ -365,6 +366,13 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                 annotation.set 
                   "@id"   : node["@id"]
                   "@type" : node["@type"]
+
+                if node["sga:textIndentLevel"]?
+                  annotation.set
+                    "indent" : node["sga:textIndentLevel"]["@value"]
+                if node["sga:textAlignment"]?
+                  annotation.set
+                    "align" : node["sga:textAlignment"]
 
       # Now deal with highlights.
       # Each addition, deletion, etc., targets a scContentAnnotation
