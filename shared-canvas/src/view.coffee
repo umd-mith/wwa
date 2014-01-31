@@ -391,6 +391,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
       @lastLine = -1
       @currentLine = 0
+
+      @lineAlignments = {}
+      @lineIndents = {}
+
       @currentLineEl = $("<div></div>")
       @$el.append @currentLineEl
 
@@ -410,6 +414,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           # new line container
           @currentLineEl = $("<div></div>")
           @$el.append @currentLineEl
+
+          if model.get("align")?
+              @currentLineEl.css
+                'text-align': model.get("align")
+            if model.get("indent")?
+              @currentLineEl.css
+                'padding-left': (Math.floor(model.get("indent")) or 0)+"em"
 
     render: ->
       @variables.on 'change:width', (w) ->
