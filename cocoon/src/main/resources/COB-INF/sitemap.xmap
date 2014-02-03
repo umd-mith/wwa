@@ -64,12 +64,29 @@
         <map:serialize type="xml"/>
       </map:match>
       
-      <map:match pattern="surfaces/*">
+      <map:match pattern="pasteons/*">
         <map:generate src="cocoon:/lbs/{1}.xml"/>
         <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
           <map:parameter name="milestone" value="pb"/>
           <map:parameter name="wrapper" value="surface"/>
+          <map:parameter name="wrapper_parent" value="floatingText"/>
+          <map:parameter name="keep" value="flase"/>
         </map:transform>
+        <map:serialize type="xml"/>
+      </map:match>
+      
+      <map:match pattern="surfaces/*">
+        <map:generate src="cocoon:/pasteons/{1}"/>
+        <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
+          <map:parameter name="milestone" value="pb"/>
+          <map:parameter name="wrapper" value="surface"/>
+        </map:transform>
+        <map:serialize type="xml"/>
+      </map:match>
+      
+      <map:match pattern="groupPasteons/*">
+        <map:generate src="cocoon:/surfaces/{1}"/>
+        <map:transform src="xslt/groupPasteons.xsl" type="saxon"/>
         <map:serialize type="xml"/>
       </map:match>
       
@@ -124,7 +141,7 @@
       </map:match>
 
       <map:match pattern="convert_nosplit/*">
-        <map:generate src="cocoon:/cleanup/{1}"/>
+        <map:generate src="cocoon:/groupPasteons/{1}"/>
         <map:serialize type="xml"/>
       </map:match> 
       
