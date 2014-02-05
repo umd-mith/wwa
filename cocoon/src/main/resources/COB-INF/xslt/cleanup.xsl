@@ -16,6 +16,7 @@
   
   <!-- remove empty lines -->
   <xsl:template match="tei:line[normalize-space()=''][count(*)=1][tei:lb]"/>
+  <xsl:template match="tei:line[normalize-space()=''][count(*)=0]"/>
   
   <xsl:template match="tei:line[tei:graphic]">
     <xsl:apply-templates select="tei:graphic"/>
