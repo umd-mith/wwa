@@ -21,6 +21,11 @@
     <xsl:apply-templates select="tei:graphic"/>
   </xsl:template>
   
+  <xsl:template match="tei:line[normalize-space()=''][count(*)=2][tei:lb][tei:milestone]
+    | tei:line[normalize-space()=''][count(*)=1][tei:milestone]">
+    <xsl:apply-templates select="tei:milestone"/>
+  </xsl:template>
+  
   <xsl:template match="tei:lb"/>
   
   <xsl:template match="tei:line[tei:line]">
@@ -28,5 +33,7 @@
   </xsl:template>
   
   <xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:zone[normalize-space()='']]"/>
+  
+  <xsl:template match="tei:zone[@type='main'][normalize-space()=''][distinct-values(*/local-name())='line']"/>
   
 </xsl:stylesheet>
