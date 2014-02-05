@@ -70,7 +70,7 @@
           <map:parameter name="milestone" value="pb"/>
           <map:parameter name="wrapper" value="surface"/>
           <map:parameter name="wrapper_parent" value="floatingText"/>
-          <map:parameter name="keep" value="flase"/>
+          <map:parameter name="keep" value="false"/>
         </map:transform>
         <map:serialize type="xml"/>
       </map:match>
@@ -91,7 +91,7 @@
       </map:match>
       
       <map:match pattern="zones/*">
-        <map:generate src="cocoon:/surfaces/{1}"/>
+        <map:generate src="cocoon:/groupPasteons/{1}"/>
         <!-- NB this doubles as a "main" zone wrapper when cb is absent -->
         <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
           <map:parameter name="milestone" value="cb"/>
@@ -101,19 +101,20 @@
         <map:serialize type="xml"/>
       </map:match>
       
+      <map:match pattern="_convert/*">
+        <map:generate src="cocoon:/zones/{1}"/>
+        <map:transform src="xslt/text2sourceDoc.xsl" type="saxon"/>
+        <map:serialize type="xml"/>
+      </map:match>
+      
       <map:match pattern="lines/*">
         <map:generate src="cocoon:/_convert/{1}"/>
         <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
           <map:parameter name="milestone" value="lb"/>
           <map:parameter name="wrapper" value="line"/>
           <map:parameter name="wrapper_parent" value="zone"/>
+          <map:parameter name="keep" value="false"/>
         </map:transform>
-        <map:serialize type="xml"/>
-      </map:match>
-      
-      <map:match pattern="_convert/*">
-        <map:generate src="cocoon:/zones/{1}"/>
-        <map:transform src="xslt/text2sourceDoc.xsl" type="saxon"/>
         <map:serialize type="xml"/>
       </map:match>
       
@@ -141,7 +142,7 @@
       </map:match>
 
       <map:match pattern="convert_nosplit/*">
-        <map:generate src="cocoon:/groupPasteons/{1}"/>
+        <map:generate src="cocoon:/cleanup/{1}"/>
         <map:serialize type="xml"/>
       </map:match> 
       
