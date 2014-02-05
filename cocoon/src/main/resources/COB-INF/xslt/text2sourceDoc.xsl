@@ -197,9 +197,12 @@
     <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)]">
         <xsl:copy>
             <xsl:attribute name="type">main</xsl:attribute>
-            <xsl:apply-templates select="@*|node()"/>
+            <xsl:apply-templates select="@*|node() except tei:zone[@type='pasteon']"/>
         </xsl:copy>
+        <!-- Keep pasteons in separate zones -->
+        <xsl:apply-templates select="tei:zone[@type='pasteon']"/>
     </xsl:template>
+    
     
     <xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:lb]"/>
     
