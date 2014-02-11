@@ -264,11 +264,11 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
           target : target["full"]
         if target["oa:hasStyle"]?
           styleItem = graph[target["oa:hasStyle"]["@id"]]
-          if "text/css" in styleItem["format"]
-            content.set
+          if "text/css" in SGASharedCanvas.Utils.makeArray(styleItem["format"])
+            model.set
               css : styleItem["chars"]
         if target["oa:hasClass"]?
-          content.set
+          model.set
             cssclass : target["oa:hasClass"]
         extractSpatialConstraint model, target["selector"]
       else
