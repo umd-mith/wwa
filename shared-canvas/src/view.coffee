@@ -389,11 +389,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       super
       @listenTo @collection, 'add', @addOne
 
-      @lastLine = -1
       @currentLine = 0
-
-      @lineAlignments = {}
-      @lineIndents = {}
 
       @currentLineEl = $("<div></div>")
       @$el.append @currentLineEl
@@ -401,15 +397,41 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @render()
 
     addOne: (model) ->
-      # console.log model
       # Instiate different views depending on the type of annotation.
       type = model.get "type"
       switch
-        when "Text" in type or "sgaLineAnnotation" in type or "sgaDeletionAnnotation" in type or "sgaSearchAnnotation" in type    
+        when "sgaAdditionAnnotation" in type
+
+          # Parse additions first, as they might require an extra line
+          if /vertical-align: super;/.test(model.get("css"))
+            additionLine = if not @currentLineEl.prev().hasClass('above-line') \
+                           then $("<div class='above-line'></div>")\
+                           else @currentLineEl.prev()
+
+            textAnnoView = new TextAnnoView 
+              model: model 
+            additionLine.append(textAnnoView.render()?.el).insertBefore(@currentLineEl)
+            
+          else if /vertical-align: sub;/.test(model.get("css"))
+            additionLine = if not @currentLineEl.next().hasClass('below-line') \
+                           then $("<div class='below-line'></div>")\
+                           else @currentLineEl.next()
+
+            textAnnoView = new TextAnnoView 
+              model: model 
+            additionLine.append(textAnnoView.render()?.el).insertAfter(@currentLineEl)
+          else
+            textAnnoView = new TextAnnoView 
+              model: model 
+            @currentLineEl.append textAnnoView.render()?.el
+
+        when "Text" in type \
+        or "sgaLineAnnotation" in type \
+        or "sgaDeletionAnnotation" in type \
+        or "sgaSearchAnnotation" in type
           textAnnoView = new TextAnnoView 
             model: model 
           @currentLineEl.append textAnnoView.render()?.el
-        #TODO: when "sgaAdditionAnnotation"
         when "LineBreak" in type
 
           # Before creating a new line container, add other classes on the current one.
@@ -426,46 +448,14 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           # and add a new line container that will be populated at the next run of addOne()
           @currentLineEl = $("<div></div>")
           @$el.append @currentLineEl
+
+          # Update currentLine count
+          @currentLine += 1
           
 
     render: ->
       @variables.on 'change:width', (w) ->
         @$l.attr('width', w/10)
-
-      # SCALE?
-
-      #
-      # We draw each text span type the same way. We rely on the
-      # item.type to give us the CSS classes we need for the span
-      #
-      # lines = {}
-      # lineAlignments = {}
-      # lineIndents = {}
-      # scaleSettings = []
-      # currentLine = 0
-
-      #
-      # For now, we are dependent on the collection to retain the ordering
-      # of items based on insertion order.
-      #
-      # that.addLens 'AdditionAnnotation', additionLens
-      # that.addLens 'DeletionAnnotation', annoLens
-      # that.addLens 'SearchAnnotation', annoLens
-      # that.addLens 'LineAnnotation', annoLens
-      # that.addLens 'Text', -> #annoLens
-
-      #
-      # Line breaks are different. We just want to add an explicit
-      # break without any classes or styling.
-      #
-      # that.addLens 'LineBreak', (container, view, model, id) ->          
-      #   item = model.getItem id
-      #   if item.align?.length > 0
-      #     lineAlignments[currentLine] = item.align[0]
-      #   if item.indent?.length > 0
-      #     lineIndents[currentLine] = Math.floor(item.indent[0]) or 0
-      #   currentLine += 1
-        # null
       @
 
   class TextAnnoView extends Backbone.View
@@ -475,13 +465,6 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @$el.css 'display', 'inline-block'
       @$el.text @model.get "text"
       @$el.addClass @model.get("type").join(" ")
-
-      if @model.get("align")?
-          @$el.css
-            'text-align': @model.get("align")
-      if @model.get("indent")?
-        @$el.css
-          'padding-left': (Math.floor(@model.get("indent")) or 0)+"em"
 
       icss = @model.get "css"
       if icss? and not /^\s*$/.test(icss) then @$el.attr "style", icss
