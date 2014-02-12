@@ -394,9 +394,89 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @currentLineEl = $("<div></div>")
       @$el.append @currentLineEl
 
+      @lastRendering = null
+
       @render()
 
     addOne: (model) ->
+
+      setPosition = (annoEl) =>
+        # Calculate space needed (good luck...)
+        ourWidth = @variables.get("width") / 10
+        ourLeft = annoEl.offset().left
+        rendering_width = annoEl.width() / @variables.get("scale")
+        annoEl.css
+          width: Math.ceil(rendering_width * @variables.get("scale")) + "px"
+
+        if @lastRendering.get(0)?
+          console.log @lastRendering
+          myOffset = annoEl.offset()
+          if @lastRendering.hasClass 'DeletionAnnotation'
+            middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false)/2)
+          else
+            middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false))
+          myMiddle = myOffset.left + annoEl.outerWidth(false)/2
+          neededSpace = middle - myMiddle
+
+          # now we need to make sure we aren't overlapping with other text - if so, move to the right
+          prevSibling = annoEl.prev()
+          accOffset = 0
+          spacing = 0
+          if prevSibling? and prevSibling.size() > 0
+            prevOffset = prevSibling.offset()
+            accOffset = prevSibling.offset().left + prevSibling.outerWidth(false) - ourLeft
+            spacing = (prevOffset.left + prevSibling.outerWidth(false)) - myOffset.left
+            spacing = parseInt(prevSibling.css('left'),10) or 0 #(prevOffset.left) - myOffset.left
+
+            if spacing > neededSpace
+              neededSpace = spacing
+
+          if neededSpace >= 0
+            if neededSpace + (myOffset.left - ourLeft) + accOffset + annoEl.outerWidth(false) > ourWidth
+
+              neededSpace = ourWidth - (myOffset.left - ourLeft) - accOffset - annoEl.outerWidth(false)
+
+          # if we need negative space, then we need to move to the left if we can
+          if neededSpace < 0
+            # we need to move some of the other elements on this line
+            if !prevSibling? or prevSibling.size() <= 0
+              neededSpace = 0
+            else
+              neededSpace = -neededSpace
+              prevSiblings = annoEl.prevAll()
+              availableSpace = 0
+              prevSiblings.each (i, x) ->
+                availableSpace += (parseInt($(x).css('left'),10) or 0)
+              if prevSibling.size() > 0
+                availableSpace -= (prevSibling.offset().left - ourLeft + prevSibling.outerWidth(false))
+              if availableSpace > neededSpace
+                usedSpace = 0
+                prevSiblings.each (i, s) ->
+                  oldLeft = parseInt($(s).css('left'), 10) or 0
+                  if availableSpace > 0
+                    useWidth = Math.floor(oldLeft * (neededSpace - usedSpace) / availableSpace)
+                    $(s).css('left', (oldLeft - useWidth - usedSpace) + "px")
+                    usedSpace += useWidth
+                    availableSpace -= oldLeft
+
+                neededSpace = -neededSpace
+              else
+                prevSiblings.each (i, s) -> $(s).css('left', "0px")                      
+                neededSpace = 0
+
+          if neededSpace > 0
+            if prevSibling.size() > 0
+              if neededSpace < parseInt(prevSibling.css('left'), 10)
+                neededSpace = parseInt(prevSibling.css('left'), 10)
+            annoEl.css
+                'position': 'relative'
+                'left': (neededSpace) + "px"
+            # rendering.left = neededSpace / @variables.get("scale")
+            # rendering.setScale = (s) ->
+            #   annoEl.css
+            #     'left': Math.floor(rendering.left * s) + "px"
+            #     'width': Math.ceil(rendering.width * s) + "px"
+
       # Instiate different views depending on the type of annotation.
       type = model.get "type"
       switch
@@ -410,8 +490,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
             textAnnoView = new TextAnnoView 
               model: model 
-            additionLine.append(textAnnoView.render()?.el).insertBefore(@currentLineEl)
-            
+            annoEl = $ textAnnoView.render()?.el
+            additionLine.append(annoEl).insertBefore(@currentLineEl)
+
+            setPosition(annoEl)
+
+            @lastRendering = annoEl
+
           else if /vertical-align: sub;/.test(model.get("css"))
             additionLine = if not @currentLineEl.next().hasClass('below-line') \
                            then $("<div class='below-line'></div>")\
@@ -419,11 +504,18 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
             textAnnoView = new TextAnnoView 
               model: model 
-            additionLine.append(textAnnoView.render()?.el).insertAfter(@currentLineEl)
+            annoEl = $ textAnnoView.render()?.el
+            additionLine.append(annoEl).insertAfter(@currentLineEl)
+
+            setPosition(annoEl)
+
+            @lastRendering = annoEl
+
           else
             textAnnoView = new TextAnnoView 
               model: model 
-            @currentLineEl.append textAnnoView.render()?.el
+            @lastRendering = annoEl = $ textAnnoView.render()?.el
+            @currentLineEl.append annoEl
 
         when "Text" in type \
         or "sgaLineAnnotation" in type \
@@ -431,7 +523,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         or "sgaSearchAnnotation" in type
           textAnnoView = new TextAnnoView 
             model: model 
-          @currentLineEl.append textAnnoView.render()?.el
+          annoEl = $ textAnnoView.render()?.el          
+          @currentLineEl.append annoEl
+          @lastRendering = annoEl if annoEl.get(0)?
         when "LineBreak" in type
 
           # Before creating a new line container, add other classes on the current one.
