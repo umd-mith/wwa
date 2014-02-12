@@ -409,9 +409,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           width: Math.ceil(rendering_width * @variables.get("scale")) + "px"
 
         if @lastRendering.get(0)?
-          console.log @lastRendering
           myOffset = annoEl.offset()
-          if @lastRendering.hasClass 'DeletionAnnotation'
+          if @lastRendering.hasClass 'sgaDeletionAnnotation'
+            # If the previous is a deletion, stick it in the middle!
             middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false)/2)
           else
             middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false))
@@ -430,7 +430,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
             if spacing > neededSpace
               neededSpace = spacing
-
+          
           if neededSpace >= 0
             if neededSpace + (myOffset.left - ourLeft) + accOffset + annoEl.outerWidth(false) > ourWidth
 
