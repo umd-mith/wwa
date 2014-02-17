@@ -258,7 +258,6 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
     extractTextTarget = (model, id) ->
       return unless id?
       target = graph[id]
-      #console.log model, target
       if "oa:SpecificResource" in SGASharedCanvas.Utils.makeArray(target["@type"])
         model.set
           target : target["full"]
@@ -267,9 +266,9 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
           if "text/css" in SGASharedCanvas.Utils.makeArray(styleItem["format"])
             model.set
               css : styleItem["chars"]
-        if target["oa:hasClass"]?
+        if target["sga:hasClass"]?
           model.set
-            cssclass : target["oa:hasClass"]
+            cssclass : target["sga:hasClass"]
         extractSpatialConstraint model, target["selector"]
       else
         model.set
@@ -349,30 +348,30 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
           # Get everything else (including project-specific annotations!) for this canvas
           # Could this be moved into its own project-specific module at some point?
           else 
-            sgaTypes = (f.substr(4) for f in types when f.substr(0,4) == "sga:" and f.substr(f.length-10) == "Annotation")
-            if sgaTypes.length > 0
-              sources = []
-              canvas.contents.forEach (c,i) ->
-                s = c.get("source")
-                if s? and s not in sources
-                  sources.push s
-              
-              # filter annotations and store only those relevant to the current canvas
-              if graph[target]["full"] in sources
-                annotation = new Annotation
-                canvas.SGAannos.add annotation
+            # sgaTypes = (f.substr(4) for f in types when f.substr(0,4) == "sga:" and f.substr(f.length-10) == "Annotation")
+            sources = []
+            canvas.contents.forEach (c,i) ->
+              s = c.get("source")
+              if s? and s not in sources
+                sources.push s
+            
+      	    # filter annotations and store only those relevant to the current canvas
+      	    if graph[target]?
+              if graph[target].hasOwnProperty("full")
+                if graph[target]["full"] in sources
+                  annotation = new Annotation
+                  canvas.SGAannos.add annotation
+                  extractTextTarget annotation, target
+                  annotation.set 
+                    "@id"   : node["@id"]
+                    "@type" : node["@type"]
 
-                extractTextTarget annotation, target
-                annotation.set 
-                  "@id"   : node["@id"]
-                  "@type" : node["@type"]
-
-                if node["sga:textIndentLevel"]?
-                  annotation.set
-                    "indent" : node["sga:textIndentLevel"]["@value"]
-                if node["sga:textAlignment"]?
-                  annotation.set
-                    "align" : node["sga:textAlignment"]
+                  if node["sga:textIndentLevel"]?
+                    annotation.set
+                      "indent" : node["sga:textIndentLevel"]["@value"]
+                  if node["sga:textAlignment"]?
+                    annotation.set
+                      "align" : node["sga:textAlignment"]
 
       # Now deal with highlights.
       # Each addition, deletion, etc., targets a scContentAnnotation
