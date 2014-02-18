@@ -212,7 +212,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         x     : 0
         y     : 0
         scale : 0
-        scrollWidth:0
+        scrollWidth: 0
 
       # Set values if provided
       if options.vars? and typeof options.vars == 'object'
@@ -401,7 +401,19 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         @$el.attr('width', w/10)
 
       @variables.on 'change:scrollWidth', (sw) =>
-        @$el.css('font-size', parseInt(@$el.css('font-size'))-1) while @el.offsetWidth < @el.scrollWidth
+        adjust = =>
+          # fix font size
+          fs = parseInt(@$el.css('font-size'))          
+          @$el.css('font-size', fs-1 + 'px')
+
+          # based on font size adjustment (in percentage),
+          # adjust line height
+          adj = .5
+          perc = fs-1 * 100 / fs
+          lh = @$el.css('line-height').slice(0,-2)
+          @$el.css('line-height', lh - (lh * perc / 100) + adj + 'px')
+
+        adjust() while @el.offsetWidth < @el.scrollWidth
 
     addOne: (model) ->
 
