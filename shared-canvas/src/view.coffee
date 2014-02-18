@@ -212,6 +212,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         x     : 0
         y     : 0
         scale : 0
+        scrollWidth:0
 
       # Set values if provided
       if options.vars? and typeof options.vars == 'object'
@@ -396,7 +397,11 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
       @lastRendering = null
 
-      @render()
+      @variables.on 'change:width', (w) =>
+        @$el.attr('width', w/10)
+
+      @variables.on 'change:scrollWidth', (sw) =>
+        @$el.css('font-size', parseInt(@$el.css('font-size'))-1) while @el.offsetWidth < @el.scrollWidth
 
     addOne: (model) ->
 
@@ -493,7 +498,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             annoEl = $ textAnnoView.render()?.el
             additionLine.append(annoEl).insertBefore(@currentLineEl)
 
-            setPosition(annoEl)
+            setPosition annoEl
 
             @lastRendering = annoEl
 
@@ -507,7 +512,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             annoEl = $ textAnnoView.render()?.el
             additionLine.append(annoEl).insertAfter(@currentLineEl)
 
-            setPosition(annoEl)
+            setPosition annoEl
 
             @lastRendering = annoEl
 
@@ -546,11 +551,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           # Update currentLine count
           @currentLine += 1
           
+      if @variables.get('scrollWidth') != @el.scrollWidth
+        @variables.set('scrollWidth', @el.scrollWidth)
 
-    render: ->
-      @variables.on 'change:width', (w) ->
-        @$l.attr('width', w/10)
-      @
 
   class TextAnnoView extends Backbone.View
     tagName: "span"
