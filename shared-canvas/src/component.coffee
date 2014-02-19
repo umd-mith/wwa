@@ -159,4 +159,29 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
       else if Math.floor zoom-1 == Math.floor minZoom
         @variables.set "zoom", minZoom
 
+  class SGASharedCanvas.Component.ReadingModeControls extends ComponentView
+
+    initialize: ->
+      super
+      @manifests = SGASharedCanvas.Data.Manifests
+
+    events: 
+      'click #img-only': 'setImgMode'
+      'click #mode-std': 'setStdMode'
+      'click #mode-rdg': 'setRdgMode'
+      'click #mode-txt': 'setTxtMode' #WWA
+      'click #mode-xml': 'setXmlMode'
+
+    setImgMode: (e) ->
+      e.preventDefault()
+      @manifests.trigger "readingMode", 'img'
+
+    setStdMode: (e) ->
+      e.preventDefault()
+      @manifests.trigger "readingMode", 'std'
+
+    setTxtMode: (e) ->
+      e.preventDefault()
+      @manifests.trigger "readingMode", 'txt'
+
 )()
