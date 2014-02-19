@@ -49,6 +49,30 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
     initialize: ->
 
+      fetchCanvas = (n) =>
+        # For now we assume there is only one sequence.
+        # Eventually this should be on a sequence view.
+        # From the sequence, we locate the correct canvas id
+        sequence = @model.sequences.first()
+
+        canvases = sequence.get "canvases"
+
+        @variables.set "seqMax", canvases.length
+        @variables.set "seqPage", parseInt(n)
+
+        n = canvases.length if n > canvases.length
+        canvasId = canvases[n-1]
+        # Create the view
+        canvas = @model.canvasesData.add
+          id : canvasId
+        # Finally fetch the data. This will cause the views to render.
+        canvas.fetch @model
+
+        # Render canvas metadata          
+        new CanvasMetaView 
+          el: "#SGACanvasMeta"
+          model: @model.canvasesMeta.get canvasId
+
       @model.ready = (cb) ->
         if @sequences.length > 0
           cb()
@@ -65,7 +89,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @metaTemplate = _.template($('#manifestMeta-tpl').html())
 
       # Add views for child collections right away
-      new CanvasesView collection: @model.canvasesData
+      @canvasesView = new CanvasesView collection: @model.canvasesData
 
       # When a new canvas is requested through a Router, fetch the right canvas data.
       @listenTo SGASharedCanvas.Data.Manifests, 'page', (n) ->
@@ -75,32 +99,24 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         # 2. it causes previously instantiated views to destroy themselves and make room for the new one.
         @model.canvasesData.reset()
 
-        fetchCanvas = =>
-          # For now we assume there is only one sequence.
-          # Eventually this should be on a sequence view.
-          # From the sequence, we locate the correct canvas id
-          sequence = @model.sequences.first()
-
-          canvases = sequence.get "canvases"
-
-          @variables.set "seqMax", canvases.length
-          @variables.set "seqPage", parseInt(n)
-
-          n = canvases.length if n > canvases.length
-          canvasId = canvases[n-1]
-          # Create the view
-          canvas = @model.canvasesData.add
-            id : canvasId
-          # Finally fetch the data. This will cause the views to render.
-          canvas.fetch @model
-
-          # Render canvas metadata          
-          new CanvasMetaView 
-            el: "#SGACanvasMeta"
-            model: @model.canvasesMeta.get canvasId
-
         # Make sure manifest is loaded        
-        @model.ready fetchCanvas   
+        @model.ready -> 
+          fetchCanvas n
+
+      @listenTo SGASharedCanvas.Data.Manifests, 'readingMode', (m) ->
+
+        @model.canvasesData.reset()
+
+        filter = []
+
+        switch m
+          when "img" then filter.push "Image"
+          when "std" then filter.push "Image", "Text"
+          when "txt" then filter.push "Text"
+
+        @canvasesView.filter = filter
+
+        fetchCanvas @variables.get "seqPage"
 
       @render()
       @model.ready @renderMeta
@@ -134,6 +150,11 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         data: @model
 
       syncVarsFor slider
+
+      # Reading Mode Controls
+      readingModeControls = new SGASharedCanvas.Component.ReadingModeControls
+        el : '#mode-controls'
+
       @
 
   # Canvases view
@@ -144,8 +165,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
     addOne: (c) ->
       # Only trigger views once the model contains canvas data (but not subcollections yet)
-      @listenToOnce c, 'sync', ->
-        new CanvasView model: c
+      @listenToOnce c, 'sync', =>
+        new CanvasView 
+          model: c
+          filter: @filter
 
     render: ->
       @
@@ -153,14 +176,16 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
   # Canvas view
   class CanvasView extends Backbone.View
 
-    initialize: ->
+    initialize: (options) ->
       @listenTo @model, 'remove', @remove
 
-      @render()         
+      @render(options["filter"])         
 
-    render: ->
+    render: (filter) ->
       # Here we collect data-types expressed in HTML and
       # we organize further collections according to them.
+
+      # filter is used to specify which areas to render (default: all)
 
       areas = []
 
@@ -169,7 +194,11 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       tpl.find('.sharedcanvas').each ->
         data = $(@).data()
         data["el"] = @
-        areas.push data
+        if filter?
+          if data.types in filter
+            areas.push data
+        else
+          areas.push data
 
       # Attach the template to #mainSharedCanvas (must be provided in the HTML)
       # Eventually we could take the destination div as a paramenter when initializing the app.
@@ -177,6 +206,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       $("#mainSharedCanvas").append @$el
 
       for area in areas        
+        # First, determine how many Bootstrap columns each area takes
+        col = parseInt(12 / areas.length)
+        $(area.el).addClass("col-xs-"+col)
+
         # We use canvas data to render views for the areas.
         # Each area is an independent view on the canvas data.
         new ViewerAreaView 
