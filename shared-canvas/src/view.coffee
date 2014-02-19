@@ -441,10 +441,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
           # based on font size adjustment (in percentage),
           # adjust line height
-          adj = .5
+          adj = 5
+          maxAdj = parseInt(@$el.css('font-size'))
           perc = fs-1 * 100 / fs
           lh = @$el.css('line-height').slice(0,-2)
-          @$el.css('line-height', lh - (lh * perc / 100) + adj + 'px')
+          newlh = Math.max(lh - (lh * perc / 100), maxAdj)
+          newlhAdj = (newlh * adj / 100) + newlh
+          @$el.css('line-height', newlhAdj + 'px')
 
         adjust() while @el.offsetWidth < @el.scrollWidth
 
