@@ -37,4 +37,11 @@
   
   <xsl:template match="tei:zone[@type='main'][normalize-space()=''][distinct-values(*/local-name())='line']"/>
   
+  <!-- cleanup ids -->
+  <xsl:template match="@xml:id">
+    <xsl:if test="not(preceding::*[@xml:id=current()])">
+      <xsl:copy-of select="."/>
+    </xsl:if>
+  </xsl:template>
+  
 </xsl:stylesheet>
