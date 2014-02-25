@@ -65,7 +65,11 @@
     </xsl:template>
     
     <!-- generalize semantics -->
-    <xsl:template match="tei:div[ancestor::tei:text] | tei:div1[ancestor::tei:text] | tei:list[ancestor::tei:text] | tei:head[ancestor::tei:text] | tei:lg[ancestor::tei:text] | tei:fw[ancestor::tei:text]">
+    <xsl:template match="tei:div[ancestor::tei:text] 
+        | tei:div1[ancestor::tei:text] 
+        | tei:list[ancestor::tei:text] 
+        | tei:head[ancestor::tei:text] 
+        | tei:lg[ancestor::tei:text] ">
         <xsl:variable name="anchor_id" select="generate-id()"/>
         <milestone xmlns="http://www.tei-c.org/ns/1.0" unit="tei:{local-name()}" spanTo="#{$anchor_id}">
             <xsl:if test="count(@* except @xml:id) > 0">
@@ -94,11 +98,13 @@
     
     <!-- make notes into additions -->
     <xsl:template match="tei:note[ancestor::tei:text]">
-        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
-            <xsl:copy>
-                <xsl:apply-templates select="@* except @resp|node()"/>
-            </xsl:copy>            
-        </add>
+        <xsl:if test="not(@type='authorial') and not(@place)">
+            <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+                <xsl:copy>
+                    <xsl:apply-templates select="@* except @resp|node()"/>
+                </xsl:copy>            
+            </add>
+        </xsl:if>
     </xsl:template>
     
     <!-- CLEANUP and ADJUSTMENTS from previous transformations -->
@@ -108,18 +114,88 @@
     
     <xsl:template match="tei:pb | tei:cb"/>
     
+    <xsl:template name="noteToAdd">
+        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+            <xsl:copy>
+                <xsl:apply-templates select="@* except @resp except @place|node()"/>
+            </xsl:copy>            
+        </add>
+    </xsl:template>
+    
     <xsl:template match="tei:surface[descendant::tei:pb]">
         <xsl:copy>
             <xsl:attribute name="ulx">0</xsl:attribute>
             <xsl:attribute name="uly">0</xsl:attribute>
-            <xsl:attribute name="lrx">0</xsl:attribute>
-            <xsl:attribute name="lry">0</xsl:attribute>
+            <xsl:attribute name="lrx">1000</xsl:attribute>
+            <xsl:attribute name="lry">3000</xsl:attribute>
             <xsl:attribute name="wwa:was"><xsl:text>tei:pb</xsl:text></xsl:attribute>
             <xsl:apply-templates select="@*"/>
             
             <graphic xmlns="http://www.tei-c.org/ns/1.0" url="{@facs}"/>
             
+            <!-- Top-level annotations -->
+            <xsl:if test="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top']">
+                
+                <xsl:choose>
+                    <xsl:when test="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top'][tokenize(@place, ' ')='left']">
+                        <zone type="top_marginalia_left" xmlns="http://www.tei-c.org/ns/1.0" >
+                         <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top'][tokenize(@place, ' ')='left']">
+                             <xsl:call-template name="noteToAdd"/>                             
+                         </xsl:for-each>
+                        </zone>
+                    </xsl:when>
+                    <xsl:when test="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top'][tokenize(@place, ' ')='right']">
+                        <zone type="top_marginalia_right" xmlns="http://www.tei-c.org/ns/1.0" >
+                            <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top'][tokenize(@place, ' ')='right']">
+                                <xsl:sequence select="."/>                             
+                            </xsl:for-each>
+                        </zone>
+                    </xsl:when>
+                    <!-- Only accounting for two columns at the moment... -->
+                    <xsl:otherwise>
+                        <xsl:for-each select="tei:zone[descendant::tei:cb][1][descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top']]">
+                            <zone type="top_marginalia_left" xmlns="http://www.tei-c.org/ns/1.0" >
+                                <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top']">
+                                    <xsl:call-template name="noteToAdd"/>                             
+                                </xsl:for-each>
+                            </zone>
+                        </xsl:for-each>
+                        <xsl:for-each select="tei:zone[descendant::tei:cb][2][descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top']]">
+                            <zone type="top_marginalia_right" xmlns="http://www.tei-c.org/ns/1.0" >
+                                <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top']">
+                                    <xsl:call-template name="noteToAdd"/>                             
+                                </xsl:for-each>
+                            </zone>
+                        </xsl:for-each>
+                    </xsl:otherwise>
+                </xsl:choose>
+                
+            </xsl:if>
+            
+            <!-- left margin annos -->
+            <xsl:if test="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='left']">
+                <zone type="marginalia_left" xmlns="http://www.tei-c.org/ns/1.0" >
+                    <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='left']">
+                        <xsl:call-template name="noteToAdd"/>                             
+                    </xsl:for-each>
+                </zone>
+            </xsl:if>
+            
+            
+            <!-- content (main, columns) -->
             <xsl:apply-templates select="node()"/>
+            
+            <!-- right margin annos -->
+            <xsl:if test="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='right']">
+                <zone type="marginalia_right" xmlns="http://www.tei-c.org/ns/1.0" >
+                    <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='right']">
+                        <xsl:call-template name="noteToAdd"/>                             
+                    </xsl:for-each>
+                </zone>
+            </xsl:if>
+            
+            <!-- bottom-level annotations... -->
+            
         </xsl:copy>        
     </xsl:template>    
     
@@ -141,16 +217,23 @@
     <xsl:template match="tei:zone[descendant::tei:cb][preceding-sibling::tei:zone[descendant::tei:cb]]"/>
     
     <xsl:template match="tei:zone[descendant::tei:fw]">
-        <xsl:copy>
+        <xsl:apply-templates/>
+        <!--<xsl:copy>
             <xsl:choose>
                 <xsl:when test="descendant::tei:fw[contains(@place,'top')]">
-                    <xsl:attribute name="type"><xsl:text>top</xsl:text></xsl:attribute>
+                    <xsl:attribute name="type"><xsl:text>running_head</xsl:text></xsl:attribute>
                 </xsl:when>
             </xsl:choose>            
             <line xmlns="http://www.tei-c.org/ns/1.0"><xsl:apply-templates select="@*|node()"/></line>
-        </xsl:copy>        
+        </xsl:copy>-->        
     </xsl:template>
     <xsl:template match="tei:lb[ancestor::tei:zone[descendant::tei:fw]]"/>
+    
+    <xsl:template match="tei:fw[contains(@place,'top')]">
+        <zone type="running_head" xmlns="http://www.tei-c.org/ns/1.0">
+            <xsl:apply-templates select="node()"/>
+        </zone>
+    </xsl:template>
     
     <!-- when there are no columns, make the only zone a "main" zone -->
     <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)]">
