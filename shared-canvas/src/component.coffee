@@ -72,8 +72,6 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
       @data = options.data
 
       @listenTo @variables, 'change:seqMax', (n) ->
-        # The value passed in is human readable. Remove 1.
-        n = n-1
 
         getLabel = (n) =>
           # For now we assume there is only one sequence.
@@ -97,13 +95,12 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
               min: @variables.get 'seqMin' 
               max: pages
               value: pages
-              step: 1
+              step: 0
               slide: ( event, ui ) ->
                 $(ui.handle).text(getLabel(pages - ui.value))
               stop: ( event, ui ) ->
-                # now update actual value, re-add 1 for human redeability.
-                newPage =  pages - ui.value + 1
-                Backbone.history.navigate("#/page/"+newPage)
+                newPage =  pages - ui.value
+                Backbone.history.navigate("#/page/"+(newPage+1))
 
             @$el.find("a").text( getLabel(0) )
         
@@ -127,7 +124,7 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
         try 
           if @$el.data( "ui-slider" ) # Is the container set?
             @$el.slider
-              value: @variables.get('seqMax') - n
+              value: @variables.get('seqMax') - (n-1) # The value passed in is human readable. Remove 1.
           if options.getLabel?
             @$el.find("a").text(getLabel(n))
         catch e
