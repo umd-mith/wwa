@@ -64,6 +64,23 @@
         </mod>
     </xsl:template>
     
+    <!-- Change attribute values to SGA conventions -->
+    <xsl:template match="@place">
+        <xsl:attribute name="place">
+            <xsl:choose>
+                <xsl:when test=".='infralinear'">
+                    <xsl:text>sublinear</xsl:text>
+                </xsl:when>
+                <xsl:when test=".='over'">
+                    <xsl:text>superlinear</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="."/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:attribute>        
+    </xsl:template>
+    
     <!-- generalize semantics -->
     <xsl:template match="tei:div[ancestor::tei:text] 
         | tei:div1[ancestor::tei:text] 
