@@ -44,4 +44,26 @@
     </xsl:if>
   </xsl:template>
   
+  <!-- Finish linking up marginalia zones with their line -->
+  <xsl:template match="tei:zone[@type=('marginalia_left', 'marginalia_right')]">
+    <xsl:copy>
+      <xsl:attribute name="target" select="descendant::*[@target][1]/@target"/>
+      <xsl:apply-templates select="@* except @target | node()"/>
+    </xsl:copy>
+  </xsl:template>  
+  
+  <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']]">
+    <xsl:copy>
+      <xsl:attribute name="xml:id" select="descendant::tei:anchor[@type='marginalia']/@xml:id"/>
+      <xsl:apply-templates select="@* except @xml:id | node()"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <!-- remove unnecessary milestones -->
+  <xsl:template match="tei:anchor[@type='marginalia']"/>
+  
+  <!-- take full control of targets: ie remove TEI-derived targets -->
+  <xsl:template match="*[ancestor::tei:surface][@target]/@target"/>
+  
+  
 </xsl:stylesheet>
