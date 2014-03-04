@@ -103,7 +103,7 @@ module.exports = function(grunt) {
       scripts: {
         files: ['src/*.coffee', 'less/*.less'],
         // Not uglifying, since watch is supposed to be used for development
-        tasks: ['concat:bower_js', 'coffee', 'less'], 
+        tasks: ['concat:bower_js', 'coffee', 'less', 'copy:demo'], 
         options: {
           livereload: true
         }
@@ -119,6 +119,13 @@ module.exports = function(grunt) {
           cwd: 'bower_components/font-awesome/font/', 
           src: ['**'], dest: 'demo/font/'
         }]
+      },
+      demo: {
+        files: [{
+          expand: true, 
+          cwd: 'dist', 
+          src: ['**'], dest: 'demo/js/'
+        }]
       }
     }
 
@@ -126,7 +133,7 @@ module.exports = function(grunt) {
 
 
   // Default task(s).
-  grunt.registerTask('default', ['concat:bower_js', 'coffee', 'uglify', 'less']);
+  grunt.registerTask('default', ['concat:bower_js', 'coffee', 'uglify', 'less', 'copy:demo']);
   grunt.registerTask('run', ['configureProxies', 'connect:server', 'watch']);
   grunt.registerTask('install', ['install-dependencies', 'bower', 'copy:install']);
 }

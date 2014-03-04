@@ -2,3 +2,5 @@ css
 font
 fonts
 js/bower_components.js
+js/SGASharedCanvas.js  
+js/SGASharedCanvas.min.js
