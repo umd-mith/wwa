@@ -436,6 +436,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
         indent = item.get "indent"
         align = item.get "align"
         marginalia_on = item.get "marginalia_on" 
+        marginalia_target = item.get "marginalia_target" 
         source = item.get "target"
         start = item.get "beginOffset"
         end = item.get "endOffset"
@@ -488,6 +489,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
               if options.indent? then titem.set {indent : options.indent}
               if options.align? then titem.set {align : options.align}
               if options.marginalia_on? then titem.set {marginalia_on : options.marginalia_on}
+              if options.marginalia_target? then titem.set {marginalia_target : options.marginalia_target}
               contentAnno.textItems.add titem                
             
             processNode = (start, end) ->
@@ -560,9 +562,11 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                 if needs_br and not br_pushed
                   indent = null
                   align = null
+                  marginalia_target = null
                   if modInfo[id].get("indent")? then indent = modInfo[id].get "indent"
                   if modInfo[id].get("align")? then align = modInfo[id].get "align"
-                  makeLinebreak pos, {"indent":indent, "align":align}
+                  if modInfo[id].get("marginalia_target")? then marginalia_target = modInfo[id].get "@id"
+                  makeLinebreak pos, {"indent":indent, "align":align, "marginalia_target": marginalia_target}
                   br_pushed = true
                 last_pos = pos
             processNode last_pos, text.length
