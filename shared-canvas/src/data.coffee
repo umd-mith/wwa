@@ -297,6 +297,11 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
     # Don't process annos again if the canvas is already populated.
     if canvas.contents.length <= 0
 
+      # Specific to WWA - move elsewhere, eventually.
+      lookupMarginalia = false
+      marginalia_ids = []
+      marginalia_lines = {}
+
       # find content annotations right away. You'll need these before creating parsing other annos
       for id, node of graph
 
@@ -327,6 +332,33 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
             extractSpatialConstraint zone, target
             zone.set node
 
+          # Build list of lines in marginalia
+          else if !lookupMarginalia and "sga:MarginalAnnotation" in types
+            lookupMarginalia = true
+
+      # Optional, but yet an extra full traverse of the graph to find marginalannotations
+      if lookupMarginalia
+        for id, node of graph
+
+          if node["@type"]? 
+            types = SGASharedCanvas.Utils.makeArray node["@type"]
+
+            target = node["on"]
+            body = node["resource"]
+
+            if "sga:MarginalAnnotation" in types              
+              sources = []
+              canvas.contents.forEach (c,i) ->
+                s = c.get("source")
+                if s? and s not in sources
+                  sources.push s
+
+                if graph[graph[target]["on"]]["full"] in sources
+                  if target not in marginalia_ids
+                    marginalia_ids.push target
+                    for l in node["resource"]["@list"]
+                      marginalia_lines[l] = target
+
       for id, node of graph
 
         if node["@type"]? 
@@ -354,8 +386,9 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
               s = c.get("source")
               if s? and s not in sources
                 sources.push s
-            
+
       	    # filter annotations and store only those relevant to the current canvas
+            # SGA + WWA
       	    if graph[target]?
               if graph[target].hasOwnProperty("full")
                 if graph[target]["full"] in sources
@@ -373,6 +406,18 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                     annotation.set
                       "align" : node["sga:textAlignment"]
 
+                  nid = node["@id"]
+
+                  # Put up a flag if this line is targeted by side marginalia                 
+                  if nid in marginalia_ids
+                    annotation.set
+                      "marginalia_target" : true
+
+                  # Is this a line in marginalia?
+                  if nid of marginalia_lines                    
+                    annotation.set
+                      "marginalia_on" : marginalia_lines[nid]
+
       # Now deal with highlights.
       # Each addition, deletion, etc., targets a scContentAnnotation
       # but we want to make sure we get any scContentAnnotation text
@@ -382,6 +427,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
       # [the Discworld mud.](https://github.com/Yuffster/discworld_distribution_mudlib/blob/master/obj/handlers/nroff.c)
       # It also has shades of a SAX processor thrown in.
 
+
       items = []
       modstart = {}
       modend = {}
@@ -389,6 +435,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
       setMod = (item) ->
         indent = item.get "indent"
         align = item.get "align"
+        marginalia_on = item.get "marginalia_on" 
         source = item.get "target"
         start = item.get "beginOffset"
         end = item.get "endOffset"
@@ -408,9 +455,9 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
       loadedSources = manifest.textFiles
 
       for source in sources
-        do (source) ->
+        #do (source) ->
 
-        # Store once the annotated text resource (TEI in SGA)
+        # Store once the annotated text resource (TEI in SGA, WWA)
         loaded = loadedSources.where({target : target}).length > 0
 
         if not loaded
@@ -428,7 +475,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
             modIds = []
             br_pushed = false
 
-            pushTextItem = (classes, css, contentAnno, start, end, indent=null, aling=null) ->
+            pushTextItem = (classes, css, contentAnno, start, end, options) ->
               titem = new ParsedAnno
               titem.set 
                 type: classes
@@ -438,18 +485,22 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                 target: contentAnno.get("@id")
                 start: start
                 end: end
-              if indent? then titem.set {indent : indent}
-              if align? then titem.set {align : align}
+              if options.indent? then titem.set {indent : options.indent}
+              if options.align? then titem.set {align : options.align}
+              if options.marginalia_on? then titem.set {marginalia_on : options.marginalia_on}
               contentAnno.textItems.add titem                
             
             processNode = (start, end) ->
               classes = []
               css = []
+              options = {}
               for id in modIds
                 for t in SGASharedCanvas.Utils.makeArray modInfo[id].get "@type"
                   classes.push t.replace(":", "")
                 cssClass = modInfo[id].get "cssclass"
                 if cssClass? then classes.push cssClass
+                marginalia = modInfo[id].get "marginalia_on"
+                if marginalia? then options.marginalia_on = marginalia
                 annocss = modInfo[id].get "css"
                 if $.isArray(annocss)
                   css.push annocss.join(" ")
@@ -458,7 +509,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
 
               classes.push "Text" if classes.length == 0
 
-              makeTextItems start, end, classes, css
+              makeTextItems start, end, classes, css, options
 
             #
             # We run through each possible shared canvas
@@ -468,23 +519,23 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
             # text source that the highlight is targeting in the
             # actual open annotation model.
             #
-            makeTextItems = (start, end, classes, css, indent, align) ->
+            makeTextItems = (start, end, classes, css, options) ->
               canvas.contents.forEach (c,i) ->
                 beginOffset = c.get "beginOffset"
                 endOffset = c.get "endOffset"
                 if start <= endOffset and end >= beginOffset
                   st = Math.min(Math.max(start, beginOffset), endOffset)
                   en = Math.max(Math.min(end, endOffset), beginOffset)
-                  pushTextItem classes, css, c, st, en, indent, align
+                  pushTextItem classes, css, c, st, en, options
               false
 
             #
             # A line break is just a zero-width annotation at
             # the given position.
             #
-            makeLinebreak = (pos, indent, align) ->
+            makeLinebreak = (pos, options) ->
               classes = [ "LineBreak" ]
-              makeTextItems pos, pos, classes, [ "" ], indent, align
+              makeTextItems pos, pos, classes, [ "" ], options
 
             #
             mstarts = modstart[source] || []
@@ -511,7 +562,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                   align = null
                   if modInfo[id].get("indent")? then indent = modInfo[id].get "indent"
                   if modInfo[id].get("align")? then align = modInfo[id].get "align"
-                  makeLinebreak pos, indent, align
+                  makeLinebreak pos, {"indent":indent, "align":align}
                   br_pushed = true
                 last_pos = pos
             processNode last_pos, text.length
