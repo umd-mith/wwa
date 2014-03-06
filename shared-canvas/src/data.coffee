@@ -416,7 +416,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                   # Is this a line in marginalia?
                   if nid of marginalia_lines                    
                     annotation.set
-                      "marginalia_on" : marginalia_lines[nid]
+                      "marginalia_on" : marginalia_lines[nid].replace(/\//g, '_')
 
       # Now deal with highlights.
       # Each addition, deletion, etc., targets a scContentAnnotation
@@ -565,7 +565,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                   marginalia_target = null
                   if modInfo[id].get("indent")? then indent = modInfo[id].get "indent"
                   if modInfo[id].get("align")? then align = modInfo[id].get "align"
-                  if modInfo[id].get("marginalia_target")? then marginalia_target = modInfo[id].get "@id"
+                  if modInfo[id].get("marginalia_target")? then marginalia_target = id.replace(/\//g, '_')
                   makeLinebreak pos, {"indent":indent, "align":align, "marginalia_target": marginalia_target}
                   br_pushed = true
                 last_pos = pos
