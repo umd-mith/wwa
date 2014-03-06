@@ -14,7 +14,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
     initialize: (config={}) ->     
 
-      manifestUrl = $("#SGASharedCanvasViewer").data('manifest')
+      manifestUrl = config.manifest
       # manifest = SGASharedCanvas.Data.importFullJSONLD manifestUrl 
 
       # Instantiate manifests collection and view
