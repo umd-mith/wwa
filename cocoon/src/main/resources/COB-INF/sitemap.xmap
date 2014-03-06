@@ -127,7 +127,7 @@
       <map:match pattern="split/*">
         <map:generate src="cocoon:/cleanup/{1}"/>
         <map:transform src="xslt/splitSurfaces.xsl" type="saxon">
-          <map:parameter name="destFolder" value="{contextpath:/}xml/processed"/>
+          <map:parameter name="destFolder" value="{contextpath:/}xml/processed/"/>
         </map:transform>
         <map:serialize type="xml"/>
       </map:match>
