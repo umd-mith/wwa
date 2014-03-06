@@ -158,8 +158,8 @@
         <xsl:copy>
             <xsl:attribute name="ulx">0</xsl:attribute>
             <xsl:attribute name="uly">0</xsl:attribute>
-            <xsl:attribute name="lrx">1000</xsl:attribute>
-            <xsl:attribute name="lry">3000</xsl:attribute>
+            <xsl:attribute name="lrx">4200</xsl:attribute>
+            <xsl:attribute name="lry">6000</xsl:attribute>
             <xsl:attribute name="wwa:was"><xsl:text>tei:pb</xsl:text></xsl:attribute>
             <xsl:apply-templates select="@*"/>
             
