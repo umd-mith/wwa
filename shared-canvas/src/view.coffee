@@ -449,6 +449,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           newlhAdj = (newlh * adj / 100) + newlh
           @$el.css('line-height', newlhAdj + 'px')
 
+        # MUST add some sort of failsafe here, or the browser will hang (eg if the container size is 0)
         adjust() while @el.offsetWidth < @el.scrollWidth
 
     addOne: (model) ->
@@ -536,6 +537,17 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         when "sgaAdditionAnnotation" in type
 
           # Parse additions first, as they might require an extra line
+          # or be marginal additions
+
+          if model.get("marginalia_on")?
+            @currentLineEl.parent().attr
+              'id' : model.get("marginalia_on")
+
+            @currentLineEl.parent().css
+              "position" : "absolute"
+              "overflow" : "hidden"
+
+          
           if /vertical-align: super;/.test(model.get("css"))
             additionLine = if not @currentLineEl.prev().hasClass('above-line') \
                            then $("<div class='above-line'></div>")\
@@ -584,6 +596,36 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           # Before creating a new line container, add other classes on the current one.
           # For example, alignment and indentation are stored on the line break annotation
           # and must be processed now.
+          # And marginalia for WWA.
+          if model.get("marginalia_target")?
+            # Track and move element with id=marginalia_target            
+            target = model.get("marginalia_target")
+            annotation = $('#'+target)
+
+            annotation.css 
+              "top" : @currentLineEl.offset().top - @currentLineEl.parent().offset().top
+
+            # startLineOffset = @currentLineEl.offset().top
+            # startContainerOffset = @currentLineEl.parent().offset().top
+
+
+            # updateTop = =>              
+
+            #   lineOffset = startLineOffset - startContainerOffset
+            #   # console.log @currentLineEl.offset().top - startLineOffset - $(window).scrollTop()
+            #   annotation.css 
+            #     "top" : lineOffset
+
+            # @$el.parent().on "scroll", =>
+            #   annotation.css 
+            #     "top" : @currentLineEl.offset().top - startLineOffset - $(window).scrollTop()
+            #   console.log @currentLineEl.offset().top - startLineOffset - $(window).scrollTop()
+
+            # updateTop()
+
+            @currentLineEl.css
+              "color" : "red"
+
           if model.get("align")?
               @currentLineEl.css
                 'text-align': model.get("align")
