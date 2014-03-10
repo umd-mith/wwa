@@ -542,7 +542,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
             #
             mstarts = modstart[source] || []
             mends = modend[source] || []
-            last_pos = 0
+            last_pos = -1
             positions = (parseInt(p,10) for p of mstarts).concat(parseInt(p,10) for p of mends).sort (a,b) -> a-b
             for pos in positions
               if pos != last_pos
