@@ -545,6 +545,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
             @currentLineEl.parent().css
               "position" : "absolute"
+
+            @currentLineEl.parent().parent().css
               "overflow" : "hidden"
 
           
@@ -602,29 +604,19 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             target = model.get("marginalia_target")
             annotation = $('#'+target)
 
+            _currentLineEl = @currentLineEl
+
+            start_offset = _currentLineEl.parent().offset().top
+
             annotation.css 
-              "top" : @currentLineEl.offset().top - @currentLineEl.parent().offset().top
+              "top" : _currentLineEl.offset().top - start_offset
 
-            # startLineOffset = @currentLineEl.offset().top
-            # startContainerOffset = @currentLineEl.parent().offset().top
+            @$el.parent().on "scroll", =>
+              annotation.css 
+                "top" : _currentLineEl.offset().top - start_offset
 
-
-            # updateTop = =>              
-
-            #   lineOffset = startLineOffset - startContainerOffset
-            #   # console.log @currentLineEl.offset().top - startLineOffset - $(window).scrollTop()
-            #   annotation.css 
-            #     "top" : lineOffset
-
-            # @$el.parent().on "scroll", =>
-            #   annotation.css 
-            #     "top" : @currentLineEl.offset().top - startLineOffset - $(window).scrollTop()
-            #   console.log @currentLineEl.offset().top - startLineOffset - $(window).scrollTop()
-
-            # updateTop()
-
-            @currentLineEl.css
-              "color" : "red"
+            # @currentLineEl.css
+            #   "color" : "red"
 
           if model.get("align")?
               @currentLineEl.css
