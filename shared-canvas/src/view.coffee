@@ -455,8 +455,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           newlhAdj = (newlh * adj / 100) + newlh
           @$el.css('line-height', newlhAdj + 'px')
 
-        # MUST add some sort of failsafe here, or the browser will hang (eg if the container size is 0)
-        adjust() while @el.offsetWidth < @el.scrollWidth
+        if @$el.innerWidth() != 0        
+          adjust() while @$el.innerWidth() < @el.scrollWidth 
 
     addOne: (model) ->
 
@@ -549,8 +549,12 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             @currentLineEl.parent().attr
               'id' : model.get("marginalia_on")
 
+            _w = @currentLineEl.parent().width()
+
             @currentLineEl.parent().css
               "position" : "absolute"
+
+            @currentLineEl.parent().width _w
 
             # If scrollbar plugin has been applied to the parent content zone, remove it.
             if @currentLineEl.parent().parent().perfectScrollbar?
@@ -625,9 +629,6 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
               annotation.css 
                 "top" : _currentLineEl.offset().top - start_offset
 
-            # @currentLineEl.css
-            #   "color" : "red"
-
           if model.get("align")?
               @currentLineEl.css
                 'text-align': model.get("align")
@@ -646,7 +647,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       if @variables.get('scrollWidth') != @el.scrollWidth
         @variables.set('scrollWidth', @el.scrollWidth)
 
-      @$el.parent().perfectScrollbar('update')
+      # Update scrollbar styling if plugin exists
+      if @$el.parent().perfectScrollbar?
+        @$el.parent().perfectScrollbar('update')
 
   class TextAnnoView extends Backbone.View
     tagName: "span"
