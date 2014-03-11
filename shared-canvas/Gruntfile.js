@@ -36,6 +36,8 @@ module.exports = function(grunt) {
         src: ['bower_components/modernizr/modernizr.js',
               'bower_components/jquery/jquery.min.js',
               'bower_components/jquery-ui/ui/minified/jquery-ui.min.js',
+              'bower_components/jquery-mousewheel/jquery.mousewheel.js',
+              'bower_components/perfect-scrollbar/min/perfect-scrollbar-0.4.8.min.js',
               'bower_components/bootstrap/dist/js/bootstrap.min.js',
               'lib/vendor/google-prettify.js',
               'bower_components/underscore/underscore.js',
