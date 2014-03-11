@@ -379,7 +379,6 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @$el.css
         overflow: 'auto'
         position: 'absolute'
-        # border: '1px solid red' #debug
 
       rootEl = $("<div></div>")
       $(rootEl).addClass("text-content")
@@ -398,11 +397,18 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       width = if @model.get("width")? then @model.get("width") else @variables.get("width") - x
       height = if @model.get("height")? then @model.get("height") else @variables.get("height") - y
 
-      $(@$el).css
+      @$el.css
         left: Math.floor(16 + x * @variables.get('scale')) + "px"
         top: Math.floor(y * @variables.get('scale')) + "px"
         width: Math.floor(width * @variables.get('scale')) + "px"
         height: Math.floor(height * @variables.get('scale')) + "px"
+
+      # Style scrollbars if plugin is present
+
+      if @$el.perfectScrollbar?
+        @$el.css
+          overflow: 'hidden'
+        @$el.perfectScrollbar()
 
       #
       # Here we embed the text-based view.
@@ -636,6 +642,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       if @variables.get('scrollWidth') != @el.scrollWidth
         @variables.set('scrollWidth', @el.scrollWidth)
 
+      @$el.parent().perfectScrollbar('update')
 
   class TextAnnoView extends Backbone.View
     tagName: "span"
