@@ -552,6 +552,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             @currentLineEl.parent().css
               "position" : "absolute"
 
+            # If scrollbar plugin has been applied to the parent content zone, remove it.
+            if @currentLineEl.parent().parent().perfectScrollbar?
+              @currentLineEl.parent().parent().perfectScrollbar 'destroy'
+
             @currentLineEl.parent().parent().css
               "overflow" : "hidden"
 
