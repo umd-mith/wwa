@@ -71,7 +71,7 @@
                 <xsl:when test=".='infralinear'">
                     <xsl:text>sublinear</xsl:text>
                 </xsl:when>
-                <xsl:when test=".='over'">
+                <xsl:when test=".=('over', 'supralinear')">
                     <xsl:text>superlinear</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
@@ -262,15 +262,25 @@
     </xsl:template>
     
     <!-- when there are no columns, make the only zone a "main" zone -->
-    <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)]">
+    <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)][not(@type='pasteon')]">
         <xsl:copy>
             <xsl:attribute name="type">main</xsl:attribute>
-            <xsl:apply-templates select="@*|node() except tei:zone[@type='pasteon']"/>
+            <xsl:choose>
+                <xsl:when test="ancestor::tei:surface//tei:zone[@type='pasteon'][contains(@rend, 'col-')]">
+                    <xsl:attribute name="rend">
+                        <xsl:value-of select="@rend"/>
+                        <xsl:text> col-12</xsl:text>
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="@rend"/>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:apply-templates select="@* except @rend|node() except tei:zone[@type='pasteon']"/>
         </xsl:copy>
         <!-- Keep pasteons in separate zones -->
         <xsl:apply-templates select="tei:zone[@type='pasteon']"/>
     </xsl:template>
-    
     
     <xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:lb]"/>
     
