@@ -54,6 +54,7 @@
                         <xsl:choose>
                             <xsl:when test="tei:body">
                                 <zone type="pasteon">
+                                    <xsl:sequence select="tei:body/parent::tei:surface/@rend"/>
                                     <xsl:apply-templates select="tei:body/node() except tei:add[@rend='pasteon'] except tei:note[@target]" mode="pasteons"/>
                                     <xsl:apply-templates select="//tei:text//tei:note[@target=concat('#', $add_id)]" mode="pasteons"/>
                                 </zone>
