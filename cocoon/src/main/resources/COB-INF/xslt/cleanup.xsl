@@ -37,12 +37,31 @@
   
   <xsl:template match="tei:zone[@type='main'][normalize-space()=''][distinct-values(*/local-name())='line']"/>
   
+  <xsl:template match="tei:zone[not(*)]"/>
+  
   <!-- cleanup ids -->
   <xsl:template match="@xml:id">
     <xsl:if test="not(preceding::*[@xml:id=current()])">
       <xsl:copy-of select="."/>
     </xsl:if>
   </xsl:template>
+  
+  <!--<xsl:template match="tei:zone[@type='column']">
+    <xsl:copy>
+      <xsl:choose>
+        <xsl:when test="not(preceding-sibling::tei:zone[@type='column']) and ancestor::tei:surface//tei:zone[@type='marginalia_left']">
+          <xsl:attribute name="type" select="'column_left'"/>
+        </xsl:when>
+        <xsl:when test="not(following-sibling::tei:zone[@type='column']) and ancestor::tei:surface//tei:zone[@type='marginalia_right']">
+          <xsl:attribute name="type" select="'column_right'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="@type"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:apply-templates select="@* except @type | node()"/>
+    </xsl:copy>
+  </xsl:template>-->
   
   <!-- Finish linking up marginalia zones with their line -->
   <xsl:template match="tei:zone[@type=('marginalia_left', 'marginalia_right')]">
