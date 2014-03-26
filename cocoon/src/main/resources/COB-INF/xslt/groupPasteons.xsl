@@ -48,7 +48,8 @@
                 <xsl:variable name="ids">
                     <xsl:call-template name="makeCompoundId"/>
                 </xsl:variable>
-                <surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="{$ids}" facs="{current-grouping-key()}">
+                <surface xmlns="http://www.tei-c.org/ns/1.0" xml:id="{$ids}" facs="{current-grouping-key()}"
+                    ulx="0" uly="0" lrx="4200" lry="6000">
                     <xsl:for-each select="current-group()">
                         <xsl:variable name="add_id" select="ancestor::tei:add/@xml:id"/>
                         <xsl:choose>
