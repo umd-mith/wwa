@@ -101,4 +101,8 @@
     </xsl:attribute>
   </xsl:template>
   
+  <xsl:template match="tei:add[@hand='']">
+    <xsl:apply-templates select="node()"/>
+  </xsl:template>
+  
 </xsl:stylesheet>
