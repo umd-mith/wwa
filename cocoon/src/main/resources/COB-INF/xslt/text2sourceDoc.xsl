@@ -15,6 +15,29 @@
         </xsl:copy>
     </xsl:template>
     
+    <!-- METADATA Adjustments -->
+    <xsl:template match="tei:handNote">
+        <xsl:copy>
+            <xsl:attribute name="scribeRef">
+                <xsl:choose>
+                    <xsl:when test="@scribeRef">
+                        <xsl:value-of select="@scribeRef"/>
+                    </xsl:when>
+                    <xsl:when test="lower-case(@scribe)='walt_whitman'">
+                        <xsl:text>#ww</xsl:text>
+                    </xsl:when>
+                    <xsl:when test="lower-case(@scribe)='unknown'">
+                        <xsl:text>#unk</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>#unk</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:apply-templates select="@* except @scribeRef | node()"/>
+        </xsl:copy>
+    </xsl:template>
+    
     <!-- TOP LEVEL transformations -->
     
     <xsl:template match="tei:text">
@@ -197,6 +220,15 @@
                             </xsl:for-each>
                         </zone>
                     </xsl:for-each>
+                    <!-- Or on top without columns (defaults to left) -->
+                    <xsl:if test="not(descendant::tei:cb)">
+                        <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top']">
+                            <zone type="top_marginalia_left" xmlns="http://www.tei-c.org/ns/1.0" >
+                                <xsl:call-template name="noteToAdd"/>   
+                            </zone>
+                        </xsl:for-each>
+                    </xsl:if>
+                    
                 </xsl:otherwise>
             </xsl:choose>
             
