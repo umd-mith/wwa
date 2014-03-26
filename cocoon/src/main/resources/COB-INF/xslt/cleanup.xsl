@@ -84,5 +84,21 @@
   <!-- take full control of targets: ie remove TEI-derived targets -->
   <xsl:template match="*[ancestor::tei:surface][@target]/@target"/>
   
+  <!-- Flatten WW hands -->
+  <xsl:template match="@hand | @new">
+    <xsl:attribute name="{local-name()}">
+      <xsl:variable name="h">
+        <xsl:choose>
+          <xsl:when test="starts-with(., '#')">
+            <xsl:value-of select="substring-after(., '#')"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="."/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:value-of select="//tei:handNote[@xml:id = $h]/@scribeRef"/>
+    </xsl:attribute>
+  </xsl:template>
   
 </xsl:stylesheet>
