@@ -27,7 +27,7 @@
                     <xsl:value-of select="$s_id"/>
                 </xsl:attribute>
                 
-                <xsl:apply-templates select="@*|node()" mode="splitting"/>                
+                <xsl:apply-templates select="@* except @xml:id|node()" mode="splitting"/>                
                               
             </xsl:copy>
         </xsl:result-document>
