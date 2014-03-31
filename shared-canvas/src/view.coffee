@@ -461,22 +461,30 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
     addOne: (model) ->
 
       setPosition = (annoEl) =>
-        # Calculate space needed (good luck...)
+        # Calculate space needed
+        # This function may be buggy, would benefit from a better algorithm and tests
         ourWidth = @variables.get("width") / 10
         ourLeft = annoEl.offset().left
         rendering_width = annoEl.width() / @variables.get("scale")
         annoEl.css
           width: Math.ceil(rendering_width * @variables.get("scale")) + "px"
 
-        if @lastRendering.get(0)?
+        if @lastRendering?.get(0)?
+
           myOffset = annoEl.offset()
-          if @lastRendering.hasClass 'sgaDeletionAnnotation'
+          # Although sublinear insertions may influence the position of superlinear insertions,
+          # the opposite should not be true.
+          if (@lastRendering.data("place")? and annoEl.data("place")?) and @lastRendering.data("place") == "above" and annoEl.data("place") == "below"
+              middle = myOffset.left + annoEl.outerWidth(false)/2
+          else if @lastRendering.hasClass 'sgaDeletionAnnotation'
             # If the previous is a deletion, stick it in the middle!
             middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false)/2)
           else
             middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false))
           myMiddle = myOffset.left + annoEl.outerWidth(false)/2
           neededSpace = middle - myMiddle
+
+          console.log neededSpace if annoEl.text() == "they"
 
           # now we need to make sure we aren't overlapping with other text - if so, move to the right
           prevSibling = annoEl.prev()
@@ -572,11 +580,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             textAnnoView = new TextAnnoView 
               model: model 
             annoEl = $ textAnnoView.render()?.el
+            annoEl.data "place", "above"
             additionLine.append(annoEl).insertBefore(@currentLineEl)
 
-            setPosition annoEl
-
-            @lastRendering = annoEl
+            # If the annotation is just empty space, skip
+            if annoEl.get(0)?
+              setPosition(annoEl) 
+              @lastRendering = annoEl
 
           else if /vertical-align: sub;/.test(model.get("css"))
             additionLine = if not @currentLineEl.next().hasClass('below-line') \
@@ -586,11 +596,12 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             textAnnoView = new TextAnnoView 
               model: model 
             annoEl = $ textAnnoView.render()?.el
+            annoEl.data "place", "below"
             additionLine.append(annoEl).insertAfter(@currentLineEl)
 
-            setPosition annoEl
-
-            @lastRendering = annoEl
+            if annoEl.get(0)?
+              setPosition(annoEl) 
+              @lastRendering = annoEl
 
           else
             textAnnoView = new TextAnnoView 
@@ -606,7 +617,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             model: model 
           annoEl = $ textAnnoView.render()?.el          
           @currentLineEl.append annoEl
-          @lastRendering = annoEl if annoEl.get(0)?
+          if annoEl.get(0)?
+            @lastRendering = annoEl 
         when "LineBreak" in type
 
           # Before creating a new line container, add other classes on the current one.
