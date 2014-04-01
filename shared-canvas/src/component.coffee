@@ -27,19 +27,19 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
     nextPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")+1
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
     prevPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")-1
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
     firstPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMin")
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
     lastPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMax")
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
 
     initialize: (options) ->
       super    
@@ -100,7 +100,7 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
                 $(ui.handle).text(getLabel(pages - ui.value))
               stop: ( event, ui ) ->
                 newPage =  pages - ui.value
-                Backbone.history.navigate("#/page/"+(newPage+1))
+                Backbone.history.navigate("#/p"+(newPage+1))
 
             @$el.find("a").text( getLabel(0) )
         

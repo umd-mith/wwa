@@ -12,15 +12,21 @@ SGASharedCanvas.Router = SGASharedCanvas.Router or {}
   class Main extends Backbone.Router
     routes:
       "" : "page"
-      "page/:n" : "page"
+      "p:n(/search/f\::filter|q\::query)" : "page"
 
-    page: (n) ->
+    page: (n, filter, query) ->
       n = 1 if !n? or n<1
+
+      if filter? and query?
+        @search filter, query
 
       # Trigger an event "page" on the manifests collection to 
       # fetch canvas data
       manifests = SGASharedCanvas.Data.Manifests
       manifests.trigger "page", n
+
+    search: (filter, query) ->
+      0
 
   SGASharedCanvas.Router.Main = new Main
 
