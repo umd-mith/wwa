@@ -92,21 +92,26 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @canvasesView = new CanvasesView collection: @model.canvasesData
 
       # When search results are requested through a Router, fetch the search data.
-      @listenTo SGASharedCanvas.Data.Manifests, 'search', (filter, query) ->
-        @model.searchResults.reset()
-        @model.ready =>
-          @model.searchResults.sync(filter, query)
 
       # When a new canvas is requested through a Router, fetch the right canvas data.
-      @listenTo SGASharedCanvas.Data.Manifests, 'page', (n) ->
+      @listenTo SGASharedCanvas.Data.Manifests, 'page', (n, search) ->
         # First of all, destroy any canvas already loaded. We do this for two reasons:
         # 1. it avoids piling up canvases data in the browser memory
         # 2. it causes previously instantiated views to destroy themselves and make room for the new one.
         @model.canvasesData.reset()
+        @model.searchResults.reset()
 
-        # Make sure manifest is loaded        
-        @model.ready -> 
-          fetchCanvas n
+      # When search results are requested through a Router, fetch the search data.
+        if search?          
+          @model.searchResults.fetch @model, search.filters, search.query          
+
+          @listenToOnce @model.searchResults, 'sync', ->
+            @model.ready ->
+              fetchCanvas n
+        else
+          # Make sure manifest is loaded        
+          @model.ready -> 
+            fetchCanvas n
 
       @listenTo SGASharedCanvas.Data.Manifests, 'readingMode', (m) ->
 
