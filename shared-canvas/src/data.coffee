@@ -114,6 +114,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
       @canvasesMeta = new CanvasesMeta
       @canvasesData = new CanvasesData
       @textFiles = new TextFiles
+      @resources = new Backbone.Collection
       @searchResults = new SearchAnnos
 
     url : (u) ->
@@ -242,7 +243,16 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
           manifest.ranges.add node
 
         else if "sc:Canvas" in types
+          # also listing all sources of content annos targeting each canvas
+          # When the manifest gets split, we might need a specific list for this
           manifest.canvasesMeta.add node
+
+        else if "sc:ContentAnnotation" in types
+          manifest.resources.add 
+            "id" : node["@id"]
+            "on" : id_graph[node["on"]]["full"]
+            "resource" : id_graph[node["resource"]]["full"] 
+
 
   importCanvas = (canvas, manifest) ->
     # This method imports manifest level data and metadata   
@@ -597,32 +607,35 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
 
   importSearchResults = (jsonld, manifest) ->
     # This method imports manifest level search data
+    manifest.ready ->
+      graph = jsonld["@graph"]
 
-    graph = jsonld["@graph"]
+      # This is temporary until the JSONLD is better organized
+      id_graph = {}
 
-    # This is temporary until the JSONLD is better organized
-    id_graph = {}
+      for node in graph
+        id_graph[node["@id"]] = node if node["@id"]?     
 
-    for node in graph
-      id_graph[node["@id"]] = node if node["@id"]?     
+      for id, node of graph
 
-    for id, node of graph
+        if node["@type"]? 
+          types = SGASharedCanvas.Utils.makeArray node["@type"]
 
-      if node["@type"]? 
-        types = SGASharedCanvas.Utils.makeArray node["@type"]
+          if "sga:SearchAnnotation" in types
+            target = node["on"]
+            selector = id_graph[target]["selector"]            
+            
+            resource = manifest.resources.find (res) ->
+              res.get("resource") == id_graph[target]["full"]
 
-        if "sga:SearchAnnotation" in types
-          target = node["on"]
-          selector = id_graph[target]["selector"]
+            manifest.searchResults.add
+              "@id" : node["@id"]
+              "@type" : node["@type"]
+              "target": id_graph[target]["full"]
+              "beginOffset" : id_graph[selector]["beginOffset"]
+              "endOffset" : id_graph[selector]["endOffset"]
+              "canvas_id" : resource.get("on") # For slider component
 
-          manifest.searchResults.add
-            "@id" : node["@id"]
-            "@type" : node["@type"]
-            "target": id_graph[target]["full"]
-            "beginOffset" : id_graph[selector]["beginOffset"]
-            "endOffset" : id_graph[selector]["endOffset"]
-
-    manifest.searchResults.trigger 'sync'
-
+      manifest.searchResults.trigger 'sync'
 
 )()
