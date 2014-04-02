@@ -91,9 +91,14 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       # Add views for child collections right away
       @canvasesView = new CanvasesView collection: @model.canvasesData
 
+      # When search results are requested through a Router, fetch the search data.
+      @listenTo SGASharedCanvas.Data.Manifests, 'search', (filter, query) ->
+        @model.searchResults.reset()
+        @model.ready =>
+          @model.searchResults.sync(filter, query)
+
       # When a new canvas is requested through a Router, fetch the right canvas data.
       @listenTo SGASharedCanvas.Data.Manifests, 'page', (n) ->
-
         # First of all, destroy any canvas already loaded. We do this for two reasons:
         # 1. it avoids piling up canvases data in the browser memory
         # 2. it causes previously instantiated views to destroy themselves and make room for the new one.
