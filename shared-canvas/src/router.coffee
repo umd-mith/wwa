@@ -22,7 +22,7 @@ SGASharedCanvas.Router = SGASharedCanvas.Router or {}
       if filters? and query?
         # Trigger an event "page" on the manifests collection that 
         # includes search info to fetch search data
-	manifests.trigger "page", n, {filters : filters, query : query}
+	      manifests.trigger "page", n, {filters : filters, query : query}
 
       else
         # Trigger an event "page" on the manifests collection to 
