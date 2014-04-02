@@ -86,7 +86,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
     model: ParsedAnno
 
   class SearchAnnos extends Annotations    
-    sync : (filter, query, service="http://localhost:5000/annotate?")->
+    fetch : (manifest, filter, query, service="http://localhost:5000/annotate?")->
       url = service + "f=" + filter + "&q=" + query
       Backbone.ajax
         url: url
@@ -95,7 +95,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
         processData: false
         dataType: 'json'
         success: (data) => 
-          console.log data
+          importSearchResults data, manifest
         error: (e) -> 
           throw new Error "Could not load search annotations"
 
@@ -434,6 +434,12 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
                     annotation.set
                       "marginalia_on" : marginalia_lines[nid].replace(/\//g, '_')
 
+                  # Import search result annotations for this canvas, if they exist
+                  if manifest.searchResults.length > 0
+                    manifest.searchResults.forEach (sa, i) ->
+                      if sa.get("target") in sources
+                        canvas.SGAannos.add sa
+
       # Now deal with highlights.
       # Each addition, deletion, etc., targets a scContentAnnotation
       # but we want to make sure we get any scContentAnnotation text
@@ -589,7 +595,34 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
 
       canvas.trigger 'fullsync'
 
-  importSearchResults = () ->
-    0
+  importSearchResults = (jsonld, manifest) ->
+    # This method imports manifest level search data
+
+    graph = jsonld["@graph"]
+
+    # This is temporary until the JSONLD is better organized
+    id_graph = {}
+
+    for node in graph
+      id_graph[node["@id"]] = node if node["@id"]?     
+
+    for id, node of graph
+
+      if node["@type"]? 
+        types = SGASharedCanvas.Utils.makeArray node["@type"]
+
+        if "sga:SearchAnnotation" in types
+          target = node["on"]
+          selector = id_graph[target]["selector"]
+
+          manifest.searchResults.add
+            "@id" : node["@id"]
+            "@type" : node["@type"]
+            "target": id_graph[target]["full"]
+            "beginOffset" : id_graph[selector]["beginOffset"]
+            "endOffset" : id_graph[selector]["endOffset"]
+
+    manifest.searchResults.trigger 'sync'
+
 
 )()
