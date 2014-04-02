@@ -17,16 +17,16 @@ SGASharedCanvas.Router = SGASharedCanvas.Router or {}
     page: (n, filter, query) ->
       n = 1 if !n? or n<1
 
+      manifests = SGASharedCanvas.Data.Manifests
+
       if filter? and query?
-        @search filter, query
+        # Trigger an event "search" on the manifests collection to 
+        # fetch search data
+        manifests.trigger "search", filter, query
 
       # Trigger an event "page" on the manifests collection to 
-      # fetch canvas data
-      manifests = SGASharedCanvas.Data.Manifests
+      # fetch canvas data      
       manifests.trigger "page", n
-
-    search: (filter, query) ->
-      0
 
   SGASharedCanvas.Router.Main = new Main
 
