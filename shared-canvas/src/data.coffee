@@ -85,6 +85,21 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
   class ParsedAnnos extends Backbone.Collection
     model: ParsedAnno
 
+  class SearchAnnos extends Annotations    
+    sync : (filter, query, service="http://localhost:5000/annotate?")->
+      url = service + "f=" + filter + "&q=" + query
+      Backbone.ajax
+        url: url
+        type: 'GET'
+        contentType: 'application/json'
+        processData: false
+        dataType: 'json'
+        success: (data) => 
+          console.log data
+        error: (e) -> 
+          throw new Error "Could not load search annotations"
+
+
   ## MANIFESTS ##
 
   class Manifest extends Backbone.Model
@@ -99,6 +114,7 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
       @canvasesMeta = new CanvasesMeta
       @canvasesData = new CanvasesData
       @textFiles = new TextFiles
+      @searchResults = new SearchAnnos
 
     url : (u) ->
       return @get "url"
@@ -572,5 +588,8 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
             processNode last_pos, text.length
 
       canvas.trigger 'fullsync'
+
+  importSearchResults = () ->
+    0
 
 )()
