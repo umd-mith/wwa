@@ -99,15 +99,27 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         # 1. it avoids piling up canvases data in the browser memory
         # 2. it causes previously instantiated views to destroy themselves and make room for the new one.
         @model.canvasesData.reset()
+        # Also clear search results, if any.
         @model.searchResults.reset()
+        Backbone.trigger "viewer:searchResults", [] 
 
       # When search results are requested through a Router, fetch the search data.
         if search?          
           @model.searchResults.fetch @model, search.filters, search.query          
 
           @listenToOnce @model.searchResults, 'sync', ->
-            @model.ready ->
+            searchResultsPositions = []
+
+            @model.ready =>
+              canvases = @model.sequences.first().get "canvases"
+
+              @model.searchResults.forEach (res, i) ->
+                trg = res.get("canvas_id")
+                if trg in canvases
+                  searchResultsPositions.push ($.inArray trg, canvases)
+
               fetchCanvas n
+              Backbone.trigger "viewer:searchResults", searchResultsPositions
         else
           # Make sure manifest is loaded        
           @model.ready -> 
@@ -493,8 +505,6 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false))
           myMiddle = myOffset.left + annoEl.outerWidth(false)/2
           neededSpace = middle - myMiddle
-
-          console.log neededSpace if annoEl.text() == "they"
 
           # now we need to make sure we aren't overlapping with other text - if so, move to the right
           prevSibling = annoEl.prev()
