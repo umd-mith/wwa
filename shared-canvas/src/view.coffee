@@ -177,6 +177,12 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       readingModeControls = new SGASharedCanvas.Component.ReadingModeControls
         el : '#mode-controls'
 
+      # Limit View Controls
+      limitViewControls = new SGASharedCanvas.Component.LimitViewControls
+        el : '#hand-view-controls'
+        include: ['hand-library', 'hand-comp']
+        defLimiter: 'hand-mws'
+
       @
 
   # Canvases view
