@@ -315,6 +315,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           @variables.set 'scale', DivWidth / canvasWidth
         if canvasHeight? and canvasHeight > 0
           @$el.height(DivHeight = Math.floor(canvasHeight * @variables.get 'scale'))
+        # Propagate to the rest of the viewer
         Backbone.trigger "viewer:resize", {container: @$el, scale: @variables.get('scale')}
 
       $(window).on "resize", resizer
@@ -470,24 +471,29 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @variables.on 'change:width', (w) =>
         @$el.attr('width', w/10)
 
-      @variables.on 'change:scrollWidth', (sw) =>
-        adjust = =>
-          # fix font size
-          fs = parseInt(@$el.css('font-size'))          
-          @$el.css('font-size', fs-1 + 'px')
+      adjustFontSize = =>
+        # fix font size
+        fs = parseInt(@$el.css('font-size'))          
+        @$el.css('font-size', fs-1 + 'px')
+        @variables.set 'fontSize', (fs-1) / @variables.get "scale"
 
-          # based on font size adjustment (in percentage),
-          # adjust line height
-          adj = 5
-          maxAdj = parseInt(@$el.css('font-size'))
-          perc = fs-1 * 100 / fs
-          lh = @$el.css('line-height').slice(0,-2)
-          newlh = Math.max(lh - (lh * perc / 100), maxAdj)
-          newlhAdj = (newlh * adj / 100) + newlh
-          @$el.css('line-height', newlhAdj + 'px')
+        # based on font size adjustment (in percentage),
+        # adjust line height
+        adj = 5
+        maxAdj = parseInt(@$el.css('font-size'))
+        perc = fs-1 * 100 / fs
+        lh = @$el.css('line-height').slice(0,-2)
+        newlh = Math.max(lh - (lh * perc / 100), maxAdj)
+        newlhAdj = (newlh * adj / 100) + newlh
+        @$el.css('line-height', newlhAdj + 'px')
 
+      @variables.on 'change:scrollWidth', (sw) =>       
         if @$el.innerWidth() != 0        
-          adjust() while @$el.innerWidth() < @el.scrollWidth 
+          adjustFontSize() while @$el.innerWidth() < @el.scrollWidth 
+
+      Backbone.on 'viewer:resize', (options) =>
+        if @variables.get('fontSize')?
+          @$el.css 'font-size', @variables.get('fontSize') * options.scale
 
     addOne: (model) ->
 
