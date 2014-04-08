@@ -106,8 +106,8 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
         
             # Using the concept of "Event aggregation" (similar to the dispatcher in Angles)
             # cfr.: http://addyosmani.github.io/backbone-fundamentals/#event-aggregator
-            Backbone.on 'viewer:resize', (el) =>
-              @$el.height(el.height() + 'px')
+            Backbone.on 'viewer:resize', (options) =>
+              @$el.height(options.container.height() + 'px')
 
         catch e
           console.log e, "Unable to update maximum value of slider"

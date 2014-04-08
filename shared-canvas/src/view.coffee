@@ -315,7 +315,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           @variables.set 'scale', DivWidth / canvasWidth
         if canvasHeight? and canvasHeight > 0
           @$el.height(DivHeight = Math.floor(canvasHeight * @variables.get 'scale'))
-        Backbone.trigger "viewer:resize", @$el
+        Backbone.trigger "viewer:resize", {container: @$el, scale: @variables.get('scale')}
 
       $(window).on "resize", resizer
 
@@ -482,7 +482,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
     addOne: (model) ->
 
-      setPosition = (annoEl) =>
+      setPosition = (textAnnoView, annoEl) =>
         # Calculate space needed
         # This function may be buggy, would benefit from a better algorithm and tests
         ourWidth = @variables.get("width") / 10
@@ -559,11 +559,14 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             annoEl.css
                 'position': 'relative'
                 'left': (neededSpace) + "px"
-            # rendering.left = neededSpace / @variables.get("scale")
-            # rendering.setScale = (s) ->
-            #   annoEl.css
-            #     'left': Math.floor(rendering.left * s) + "px"
-            #     'width': Math.ceil(rendering.width * s) + "px"
+          textAnnoView.variables.set "left", neededSpace / @variables.get("scale")
+          textAnnoView.variables.set "width", annoEl.width() / @variables.get("scale")
+          setScale = (s) =>
+            annoEl.css
+              'left': Math.floor(textAnnoView.variables.get("left") * s) + "px"
+              'width': Math.ceil(textAnnoView.variables.get("width") * s) + "px"
+          Backbone.on 'viewer:resize', (options) =>
+            setScale options.scale
 
       # Instiate different views depending on the type of annotation.
       type = model.get "type"
@@ -605,7 +608,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
             # If the annotation is just empty space, skip
             if annoEl.get(0)?
-              setPosition(annoEl) 
+              setPosition(textAnnoView, annoEl) 
               @lastRendering = annoEl
 
           else if /vertical-align: sub;/.test(model.get("css"))
@@ -620,7 +623,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             additionLine.append(annoEl).insertAfter(@currentLineEl)
 
             if annoEl.get(0)?
-              setPosition(annoEl) 
+              setPosition(textAnnoView, annoEl) 
               @lastRendering = annoEl
 
           else
@@ -683,10 +686,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       if @$el.parent().perfectScrollbar?
         @$el.parent().perfectScrollbar('update')
 
-  class TextAnnoView extends Backbone.View
+  class TextAnnoView extends AreaView
     tagName: "span"
 
-    render: ->     
+    render: -> 
       @$el.css 'display', 'inline-block'
       @$el.text @model.get "text"
       @$el.addClass @model.get("type").join(" ")
