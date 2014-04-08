@@ -432,6 +432,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           top: Math.floor(y * s) + "px"
           width: Math.floor(width * s) + "px"
           height: Math.floor(height * s) + "px"
+        if @$el.perfectScrollbar?
+          @$el.perfectScrollbar('update')
       Backbone.on 'viewer:resize', (options) =>
         setScale options.scale
 
