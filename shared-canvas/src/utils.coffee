@@ -23,11 +23,8 @@ SGASharedCanvas.Utils = SGASharedCanvas.Utils or {}
       @trigger 'all', @variables
       @trigger 'change:'+prop, val, @variables
 
-    get: (prop) ->
-      if @variables[prop]? 
-        @variables[prop]
-      else 
-        throw new Error "View property #{prop} does not exist."
+    get: (prop) ->  
+      @variables[prop]
 
   # Embed any object in an Array, if it isn't an Array already.
   SGASharedCanvas.Utils.makeArray = (item) ->
