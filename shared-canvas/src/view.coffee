@@ -425,6 +425,15 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         width: Math.floor(width * @variables.get('scale')) + "px"
         height: Math.floor(height * @variables.get('scale')) + "px"
 
+      setScale = (s) =>
+        @$el.css
+          left: Math.floor(16 + x * s) + "px"
+          top: Math.floor(y * s) + "px"
+          width: Math.floor(width * s) + "px"
+          height: Math.floor(height * s) + "px"
+      Backbone.on 'viewer:resize', (options) =>
+        setScale options.scale
+
       # Style scrollbars if plugin is present
 
       if @$el.perfectScrollbar?
@@ -777,13 +786,15 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         top: Math.floor(y * s)
         left: Math.floor(x * s)
 
-      # setScale = (s) ->
-      #   @$el.attr
-      #     height: Math.floor(height * s)
-      #     width: Math.floor(width * s)
-      #   @$el.css
-      #     top: Math.floor(y * s)
-      #     left: Math.floor(x * s)
+      setScale = (s) =>
+        @$el.attr
+          height: Math.floor(height * s)
+          width: Math.floor(width * s)
+        @$el.css
+          top: Math.floor(y * s)
+          left: Math.floor(x * s)
+      Backbone.on 'viewer:resize', (options) =>
+        setScale options.scale
       @
 
 
