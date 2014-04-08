@@ -204,4 +204,54 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
       e.preventDefault()
       @manifests.trigger "readingMode", 'txt'
 
+  class SGASharedCanvas.Component.LimitViewControls extends ComponentView
+
+    initialize: (options) ->
+      super
+
+      # set css classes scope to be limited from options
+      @limitValues = [].concat options.include
+      # set colors for visible and limited objects
+      @colors = options.colors
+      @colors = {} if !@colors?
+      if !@colors.visible?
+        @colors.visible = '#a54647'
+      if !@colors.limited?
+        @colors.limited = '#D9D9D9'
+      # set a default limiter if specified. 
+      # elements outside of the classes scope will be kept visible when 
+      # the default limiter is selected.
+      @defLimiter = options.defLimiter
+
+      # set css classes scope to be limited from HTML template
+      @$el.find('input').each (i,e) =>
+        v = $(e).val()
+        if v != 'all'
+          @limitValues.push $(e).val()
+
+      # Apply css to limited and visible object according to selected class
+      @$el.change (e) =>
+        checked = $(e.target).val()
+
+        # Remove limit view css if present
+        $('#LimitViewControls_classes').remove()
+
+        if checked != 'all'
+
+          # Show
+          css = ".sharedcanvas[data-types] .#{checked} { color: #{@colors.visible} }"          
+
+          # If this is the default delimiter, make elements outside of class scope visible.
+          # Also, create a css declaration for each limiter in the scope
+          if checked == @defLimiter
+            for limit in @limitValues
+              css += " .sharedcanvas[data-types] .#{limit} { color: #{@colors.limited} }"
+              css += " .sharedcanvas[data-types] *:not(.#{limit}) { color: #{@colors.visible} }"
+          # If not, then just hide everything that is not in our limiter's class
+          else
+            css += " .sharedcanvas[data-types] *:not(.#{checked}) { color: #{@colors.limited} }"
+          
+          # Append new style definitions to head
+          $("<style type='text/css' id='LimitViewControls_classes'>#{css}</style>").appendTo("head")
+
 )()
