@@ -225,31 +225,40 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
 
       # set css classes scope to be limited from HTML template
       @$el.find('input').each (i,e) =>
-        v = $(e).val()
-        if v != 'all'
-          @limitValues.push $(e).val()
+        vals = $(e).val()
+        vals = vals.split /\s+/g
+        for v in vals
+          if v != 'all'
+            @limitValues.push v
 
       # Apply css to limited and visible object according to selected class
       @$el.change (e) =>
         checked = $(e.target).val()
+        checked = checked.split /\s+/g
 
         # Remove limit view css if present
         $('#LimitViewControls_classes').remove()
 
-        if checked != 'all'
+        if 'all' not in checked
 
-          # Show
-          css = ".sharedcanvas[data-types] .#{checked} { color: #{@colors.visible} }"          
+          css = ""
+          hide = ""
 
-          # If this is the default delimiter, make elements outside of class scope visible.
-          # Also, create a css declaration for each limiter in the scope
-          if checked == @defLimiter
-            for limit in @limitValues
-              css += " .sharedcanvas[data-types] .#{limit} { color: #{@colors.limited} }"
-              css += " .sharedcanvas[data-types] *:not(.#{limit}) { color: #{@colors.visible} }"
-          # If not, then just hide everything that is not in our limiter's class
-          else
-            css += " .sharedcanvas[data-types] *:not(.#{checked}) { color: #{@colors.limited} }"
+          for c in checked
+            # Show
+            css += " .sharedcanvas[data-types] .#{c} { color: #{@colors.visible} }"          
+
+            # If this is the default delimiter, make elements outside of class scope visible.
+            # Also, create a css declaration for each limiter in the scope
+            if checked.length == 1 and c == @defLimiter
+              for limit in @limitValues
+                css += " .sharedcanvas[data-types] .#{limit} { color: #{@colors.limited} }"
+                css += " .sharedcanvas[data-types] *:not(.#{limit}) { color: #{@colors.visible} }"
+            # If not, then just hide everything that is not in our limiter's class
+            else
+              hide += ":not(.#{c})"              
+
+          css += " .sharedcanvas[data-types] *#{hide} { color: #{@colors.limited} }"
           
           # Append new style definitions to head
           $("<style type='text/css' id='LimitViewControls_classes'>#{css}</style>").appendTo("head")
