@@ -27,19 +27,19 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
     nextPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")+1
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
     prevPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")-1
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
     firstPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMin")
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
     lastPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMax")
-      Backbone.history.navigate("#/page/"+newPage)
+      Backbone.history.navigate("#/p"+newPage)
 
     initialize: (options) ->
       super    
@@ -100,14 +100,14 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
                 $(ui.handle).text(getLabel(pages - ui.value))
               stop: ( event, ui ) ->
                 newPage =  pages - ui.value
-                Backbone.history.navigate("#/page/"+(newPage+1))
+                Backbone.history.navigate("#/p"+(newPage+1))
 
             @$el.find("a").text( getLabel(0) )
         
             # Using the concept of "Event aggregation" (similar to the dispatcher in Angles)
             # cfr.: http://addyosmani.github.io/backbone-fundamentals/#event-aggregator
-            Backbone.on 'viewer:resize', (el) =>
-              @$el.height(el.height() + 'px')
+            Backbone.on 'viewer:resize', (options) =>
+              @$el.height(options.container.height() + 'px')
 
         catch e
           console.log e, "Unable to update maximum value of slider"
@@ -129,6 +129,29 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
             @$el.find("a").text(getLabel(n))
         catch e
           console.log e, "Unable to update value of slider"
+
+      # Draw search result indicators
+      Backbone.on "viewer:searchResults", (results) =>
+        # Remove existing highlights, if any
+        @$el.find('.res').remove()
+
+        # Append highglights
+
+        pages = @variables.get "seqMax"
+
+        try
+          for r in results
+            r = r
+            res_height = @$el.height() / (pages)
+            res_h_perc = (pages) / 100
+            s_min = @$el.slider("option", "min")
+            s_max = @$el.slider("option", "max")
+            valPercent = 100 - (( r - s_min ) / ( s_max - s_min )  * 100)
+            adjustment = 0 #res_h_perc / 2
+            console.log valPercent
+            @$el.append("<div style='bottom:#{valPercent + adjustment}%; height:#{res_height}px' class='res ui-slider-range ui-widget-header ui-corner-all'> </div>")
+        catch e
+          console.log "Unable to update slider with search results"
 
   class SGASharedCanvas.Component.ImageControls extends ComponentView
 
@@ -180,5 +203,55 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
     setTxtMode: (e) ->
       e.preventDefault()
       @manifests.trigger "readingMode", 'txt'
+
+  class SGASharedCanvas.Component.LimitViewControls extends ComponentView
+
+    initialize: (options) ->
+      super
+
+      # set css classes scope to be limited from options
+      @limitValues = [].concat options.include
+      # set colors for visible and limited objects
+      @colors = options.colors
+      @colors = {} if !@colors?
+      if !@colors.visible?
+        @colors.visible = '#a54647'
+      if !@colors.limited?
+        @colors.limited = '#D9D9D9'
+      # set a default limiter if specified. 
+      # elements outside of the classes scope will be kept visible when 
+      # the default limiter is selected.
+      @defLimiter = options.defLimiter
+
+      # set css classes scope to be limited from HTML template
+      @$el.find('input').each (i,e) =>
+        v = $(e).val()
+        if v != 'all'
+          @limitValues.push $(e).val()
+
+      # Apply css to limited and visible object according to selected class
+      @$el.change (e) =>
+        checked = $(e.target).val()
+
+        # Remove limit view css if present
+        $('#LimitViewControls_classes').remove()
+
+        if checked != 'all'
+
+          # Show
+          css = ".sharedcanvas[data-types] .#{checked} { color: #{@colors.visible} }"          
+
+          # If this is the default delimiter, make elements outside of class scope visible.
+          # Also, create a css declaration for each limiter in the scope
+          if checked == @defLimiter
+            for limit in @limitValues
+              css += " .sharedcanvas[data-types] .#{limit} { color: #{@colors.limited} }"
+              css += " .sharedcanvas[data-types] *:not(.#{limit}) { color: #{@colors.visible} }"
+          # If not, then just hide everything that is not in our limiter's class
+          else
+            css += " .sharedcanvas[data-types] *:not(.#{checked}) { color: #{@colors.limited} }"
+          
+          # Append new style definitions to head
+          $("<style type='text/css' id='LimitViewControls_classes'>#{css}</style>").appendTo("head")
 
 )()

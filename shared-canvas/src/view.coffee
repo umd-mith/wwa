@@ -91,17 +91,39 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       # Add views for child collections right away
       @canvasesView = new CanvasesView collection: @model.canvasesData
 
-      # When a new canvas is requested through a Router, fetch the right canvas data.
-      @listenTo SGASharedCanvas.Data.Manifests, 'page', (n) ->
+      # When search results are requested through a Router, fetch the search data.
 
+      # When a new canvas is requested through a Router, fetch the right canvas data.
+      @listenTo SGASharedCanvas.Data.Manifests, 'page', (n, search) ->
         # First of all, destroy any canvas already loaded. We do this for two reasons:
         # 1. it avoids piling up canvases data in the browser memory
         # 2. it causes previously instantiated views to destroy themselves and make room for the new one.
         @model.canvasesData.reset()
+        # Also clear search results, if any.
+        @model.searchResults.reset()
+        Backbone.trigger "viewer:searchResults", [] 
 
-        # Make sure manifest is loaded        
-        @model.ready -> 
-          fetchCanvas n
+      # When search results are requested through a Router, fetch the search data.
+        if search?          
+          @model.searchResults.fetch @model, search.filters, search.query          
+
+          @listenToOnce @model.searchResults, 'sync', ->
+            searchResultsPositions = []
+
+            @model.ready =>
+              canvases = @model.sequences.first().get "canvases"
+
+              @model.searchResults.forEach (res, i) ->
+                trg = res.get("canvas_id")
+                if trg in canvases
+                  searchResultsPositions.push ($.inArray trg, canvases)
+
+              fetchCanvas n
+              Backbone.trigger "viewer:searchResults", searchResultsPositions
+        else
+          # Make sure manifest is loaded        
+          @model.ready -> 
+            fetchCanvas n
 
       @listenTo SGASharedCanvas.Data.Manifests, 'readingMode', (m) ->
 
@@ -154,6 +176,12 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       # Reading Mode Controls
       readingModeControls = new SGASharedCanvas.Component.ReadingModeControls
         el : '#mode-controls'
+
+      # Limit View Controls
+      limitViewControls = new SGASharedCanvas.Component.LimitViewControls
+        el : '#hand-view-controls'
+        include: ['hand-library', 'hand-comp']
+        defLimiter: 'hand-mws'
 
       @
 
@@ -293,7 +321,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           @variables.set 'scale', DivWidth / canvasWidth
         if canvasHeight? and canvasHeight > 0
           @$el.height(DivHeight = Math.floor(canvasHeight * @variables.get 'scale'))
-        Backbone.trigger "viewer:resize", @$el
+        # Propagate to the rest of the viewer
+        Backbone.trigger "viewer:resize", {container: @$el, scale: @variables.get('scale')}
 
       $(window).on "resize", resizer
 
@@ -403,6 +432,17 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         width: Math.floor(width * @variables.get('scale')) + "px"
         height: Math.floor(height * @variables.get('scale')) + "px"
 
+      setScale = (s) =>
+        @$el.css
+          left: Math.floor(16 + x * s) + "px"
+          top: Math.floor(y * s) + "px"
+          width: Math.floor(width * s) + "px"
+          height: Math.floor(height * s) + "px"
+        if @$el.perfectScrollbar?
+          @$el.perfectScrollbar('update')
+      Backbone.on 'viewer:resize', (options) =>
+        setScale options.scale
+
       # Style scrollbars if plugin is present
 
       if @$el.perfectScrollbar?
@@ -439,38 +479,49 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @variables.on 'change:width', (w) =>
         @$el.attr('width', w/10)
 
-      @variables.on 'change:scrollWidth', (sw) =>
-        adjust = =>
-          # fix font size
-          fs = parseInt(@$el.css('font-size'))          
-          @$el.css('font-size', fs-1 + 'px')
+      adjustFontSize = =>
+        # fix font size
+        fs = parseInt(@$el.css('font-size'))          
+        @$el.css('font-size', fs-1 + 'px')
+        @variables.set 'fontSize', (fs-1) / @variables.get "scale"
 
-          # based on font size adjustment (in percentage),
-          # adjust line height
-          adj = 5
-          maxAdj = parseInt(@$el.css('font-size'))
-          perc = fs-1 * 100 / fs
-          lh = @$el.css('line-height').slice(0,-2)
-          newlh = Math.max(lh - (lh * perc / 100), maxAdj)
-          newlhAdj = (newlh * adj / 100) + newlh
-          @$el.css('line-height', newlhAdj + 'px')
+        # based on font size adjustment (in percentage),
+        # adjust line height
+        adj = 5
+        maxAdj = parseInt(@$el.css('font-size'))
+        perc = fs-1 * 100 / fs
+        lh = @$el.css('line-height').slice(0,-2)
+        newlh = Math.max(lh - (lh * perc / 100), maxAdj)
+        newlhAdj = (newlh * adj / 100) + newlh
+        @$el.css('line-height', newlhAdj + 'px')
 
+      @variables.on 'change:scrollWidth', (sw) =>       
         if @$el.innerWidth() != 0        
-          adjust() while @$el.innerWidth() < @el.scrollWidth 
+          adjustFontSize() while @$el.innerWidth() < @el.scrollWidth 
+
+      Backbone.on 'viewer:resize', (options) =>
+        if @variables.get('fontSize')?
+          @$el.css 'font-size', @variables.get('fontSize') * options.scale
 
     addOne: (model) ->
 
-      setPosition = (annoEl) =>
-        # Calculate space needed (good luck...)
+      setPosition = (textAnnoView, annoEl) =>
+        # Calculate space needed
+        # This function may be buggy, would benefit from a better algorithm and tests
         ourWidth = @variables.get("width") / 10
         ourLeft = annoEl.offset().left
         rendering_width = annoEl.width() / @variables.get("scale")
         annoEl.css
           width: Math.ceil(rendering_width * @variables.get("scale")) + "px"
 
-        if @lastRendering.get(0)?
+        if @lastRendering?.get(0)?
+
           myOffset = annoEl.offset()
-          if @lastRendering.hasClass 'sgaDeletionAnnotation'
+          # Although sublinear insertions may influence the position of superlinear insertions,
+          # the opposite should not be true.
+          if (@lastRendering.data("place")? and annoEl.data("place")?) and @lastRendering.data("place") == "above" and annoEl.data("place") == "below"
+              middle = myOffset.left + annoEl.outerWidth(false)/2
+          else if @lastRendering.hasClass 'sgaDeletionAnnotation'
             # If the previous is a deletion, stick it in the middle!
             middle = @lastRendering.offset().left + (@lastRendering.outerWidth(false)/2)
           else
@@ -531,11 +582,14 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             annoEl.css
                 'position': 'relative'
                 'left': (neededSpace) + "px"
-            # rendering.left = neededSpace / @variables.get("scale")
-            # rendering.setScale = (s) ->
-            #   annoEl.css
-            #     'left': Math.floor(rendering.left * s) + "px"
-            #     'width': Math.ceil(rendering.width * s) + "px"
+          textAnnoView.variables.set "left", neededSpace / @variables.get("scale")
+          textAnnoView.variables.set "width", annoEl.width() / @variables.get("scale")
+          setScale = (s) =>
+            annoEl.css
+              'left': Math.floor(textAnnoView.variables.get("left") * s) + "px"
+              'width': Math.ceil(textAnnoView.variables.get("width") * s) + "px"
+          Backbone.on 'viewer:resize', (options) =>
+            setScale options.scale
 
       # Instiate different views depending on the type of annotation.
       type = model.get "type"
@@ -572,11 +626,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             textAnnoView = new TextAnnoView 
               model: model 
             annoEl = $ textAnnoView.render()?.el
+            annoEl.data "place", "above"
             additionLine.append(annoEl).insertBefore(@currentLineEl)
 
-            setPosition annoEl
-
-            @lastRendering = annoEl
+            # If the annotation is just empty space, skip
+            if annoEl.get(0)?
+              setPosition(textAnnoView, annoEl) 
+              @lastRendering = annoEl
 
           else if /vertical-align: sub;/.test(model.get("css"))
             additionLine = if not @currentLineEl.next().hasClass('below-line') \
@@ -586,11 +642,12 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             textAnnoView = new TextAnnoView 
               model: model 
             annoEl = $ textAnnoView.render()?.el
+            annoEl.data "place", "below"
             additionLine.append(annoEl).insertAfter(@currentLineEl)
 
-            setPosition annoEl
-
-            @lastRendering = annoEl
+            if annoEl.get(0)?
+              setPosition(textAnnoView, annoEl) 
+              @lastRendering = annoEl
 
           else
             textAnnoView = new TextAnnoView 
@@ -606,7 +663,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             model: model 
           annoEl = $ textAnnoView.render()?.el          
           @currentLineEl.append annoEl
-          @lastRendering = annoEl if annoEl.get(0)?
+          if annoEl.get(0)?
+            @lastRendering = annoEl 
         when "LineBreak" in type
 
           # Before creating a new line container, add other classes on the current one.
@@ -651,10 +709,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       if @$el.parent().perfectScrollbar?
         @$el.parent().perfectScrollbar('update')
 
-  class TextAnnoView extends Backbone.View
+  class TextAnnoView extends AreaView
     tagName: "span"
 
-    render: ->     
+    render: -> 
       @$el.css 'display', 'inline-block'
       @$el.text @model.get "text"
       @$el.addClass @model.get("type").join(" ")
@@ -742,13 +800,15 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         top: Math.floor(y * s)
         left: Math.floor(x * s)
 
-      # setScale = (s) ->
-      #   @$el.attr
-      #     height: Math.floor(height * s)
-      #     width: Math.floor(width * s)
-      #   @$el.css
-      #     top: Math.floor(y * s)
-      #     left: Math.floor(x * s)
+      setScale = (s) =>
+        @$el.attr
+          height: Math.floor(height * s)
+          width: Math.floor(width * s)
+        @$el.css
+          top: Math.floor(y * s)
+          left: Math.floor(x * s)
+      Backbone.on 'viewer:resize', (options) =>
+        setScale options.scale
       @
 
 
