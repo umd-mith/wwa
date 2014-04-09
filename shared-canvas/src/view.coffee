@@ -481,19 +481,14 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
       adjustFontSize = =>
         # fix font size
-        fs = parseInt(@$el.css('font-size'))          
-        @$el.css('font-size', fs-1 + 'px')
+        fs = parseInt(@$el.css('font-size'))         
+        newfs = fs-1
+        @$el.css('font-size', newfs + 'px')
         @variables.set 'fontSize', (fs-1) / @variables.get "scale"
 
-        # based on font size adjustment (in percentage),
-        # adjust line height
-        adj = 5
-        maxAdj = parseInt(@$el.css('font-size'))
-        perc = fs-1 * 100 / fs
-        lh = @$el.css('line-height').slice(0,-2)
-        newlh = Math.max(lh - (lh * perc / 100), maxAdj)
-        newlhAdj = (newlh * adj / 100) + newlh
-        @$el.css('line-height', newlhAdj + 'px')
+        # Reset line height to 1.5 (font size * 1.5)
+        adj = newfs * 1.5
+        @$el.css('line-height', adj + 'px')
 
       @variables.on 'change:scrollWidth', (sw) =>       
         if @$el.innerWidth() != 0        
