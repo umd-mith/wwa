@@ -409,13 +409,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         overflow: 'auto'
         position: 'absolute'
 
-      rootEl = $("<div></div>")
-      $(rootEl).addClass("text-content")
-      $(rootEl).attr("id", @model.get("@id"))
-      $(rootEl).css
+      @$el.addClass("text-content")
+      @$el.attr("id", @model.get("@id"))
+      @$el.css
         "white-space": "nowrap"
-
-      @$el.append(rootEl)
 
       #
       # If we're not given an offset and size, then we assume that we're
@@ -457,7 +454,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       #      
       new TextAnnotationsView
         collection: @model.textItems
-        el: rootEl
+        el: @el
         vars : @variables.variables # Pass on properties set in this view
 
       @
