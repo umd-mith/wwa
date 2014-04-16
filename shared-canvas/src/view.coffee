@@ -308,8 +308,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       canvasWidth = null
       canvasHeight = null
 
-      # Is this needed??
-      baseFontSize = 150 # in terms of the SVG canvas size - about 15pt
+      baseFontSize = 110 # in terms of the image size - about 15pt
       DivHeight = null
       DivWidth = Math.floor(@$el.width()*20/20)
       @$el.height(Math.floor(@$el.width() * 4 / 3))
