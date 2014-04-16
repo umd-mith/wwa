@@ -266,6 +266,8 @@
                 <xsl:copy>
                     <xsl:attribute name="wwa:was"><xsl:text>tei:cb</xsl:text></xsl:attribute>
                     <xsl:attribute name="type"><xsl:text>column</xsl:text></xsl:attribute>
+                    <!-- preserve latest handshift -->
+                    <xsl:sequence select="preceding::tei:handShift[1]"/>
                     <xsl:apply-templates select="@*|node()"/>
                 </xsl:copy>
             </xsl:for-each>            
@@ -308,7 +310,10 @@
                     <xsl:apply-templates select="@rend"/>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:apply-templates select="@* except @rend|node() except tei:zone[@type='pasteon']"/>
+            <xsl:apply-templates select="@* except @rend" />
+            <!-- preserve latest handshift -->
+            <xsl:sequence select="preceding::tei:handShift[1]"/>
+            <xsl:apply-templates select="node() except tei:zone[@type='pasteon']"/>
         </xsl:copy>
         <!-- Keep pasteons in separate zones -->
         <xsl:apply-templates select="tei:zone[@type='pasteon']"/>
