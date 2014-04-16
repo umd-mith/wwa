@@ -39,13 +39,13 @@ duk.00014.xml	leaf010r	duk_nhg.00071.jp2	5025	7852
 duk.00014.xml	leaf010v	duk_nhg.00072.jp2	5125	8187
 duk.00014.xml	leaf011r	duk_nhg.00073.jp2	4078	6152
 duk.00014.xml	leaf012r	duk_nhg.00074.jp2	5892	8257
-duk.00055.xml	leaf001r	duk.00055.001.jp2
-duk.00055.xml	leaf001v	duk.00055.002.jp2
-duk.00055.xml	leaf002r	duk.00055.003.jp2
-duk.00055.xml	leaf002v	duk.00055.004.jp2
-duk.00055.xml	leaf003r	duk.00055.005.jp2
-duk.00055.xml	leaf003v	duk.00055.006.jp2
-duk.00086.xml	leaf001r	duk.00086.001.jp2
+duk.00055.xml	leaf001r	duk.00055.001.jp2	4461	6349
+duk.00055.xml	leaf001v	duk.00055.002.jp2	4329	6312
+duk.00055.xml	leaf002r	duk.00055.003.jp2	4264	6305
+duk.00055.xml	leaf002v	duk.00055.004.jp2	4365	6269
+duk.00055.xml	leaf003r	duk.00055.005.jp2	4352	6305
+duk.00055.xml	leaf003v	duk.00055.006.jp2	4344	6318
+duk.00086.xml	leaf001r	duk.00086.001.jp2	4881	6605
 duk.00106.xml	leaf001r	duk.00106.001.jp2	3403	3282
 duk.00107.xml	leaf001r	duk.00107.001.jp2	3644	1380
 duk.00109.xml	leaf001r	duk.00109.001.jp2	4112	2175
@@ -80,7 +80,7 @@ duk.00173.xml	leaf003v	duk.00173.004.jp2	2837	4848
 duk.00173.xml	leaf004r	duk.00173.005.jp2	2820	4901
 duk.00173.xml	leaf005r	duk.00173.006.jp2	2784	4921
 duk.00173.xml	leaf006r	duk.00173.007.jp2	2844	4903
-duk.00173.xml	leaf006v	duk.00173.008.jp2
+duk.00173.xml	leaf006v	duk.00173.008.jp2	861	1524
 duk.00173.xml	leaf007r	duk.00173.009.jp2	2831	4932
 duk.00173.xml	leaf007v	duk.00173.010.jp2	2934	4878
 duk.00173.xml	leaf008r	duk.00173.011.jp2	2970	4866
@@ -123,15 +123,15 @@ duk.00185.xml	leaf001r	duk.00185.001.jp2	4727	6137
 duk.00185.xml	leaf002r	duk.00185.002.jp2	4781	6196
 duk.00188.xml	leaf001r	duk.00188.001.jp2	4271	6125
 duk.00189.xml	leaf001r	duk.00189.001.jp2	3879	5433
-duk.00191.xml	leaf001r	duk.00191.001.jp2
-duk.00191.xml	leaf002r	duk.00191.002.jp2
-duk.00191.xml	leaf003r	duk.00191.003.jp2
-duk.00191.xml	leaf003v	duk.00191.004.jp2
-duk.00191.xml	leaf004r	duk.00191.005.jp2
+duk.00191.xml	leaf001r	duk.00191.001.jp2	2737	4415
+duk.00191.xml	leaf002r	duk.00191.002.jp2	2555	4403
+duk.00191.xml	leaf003r	duk.00191.003.jp2	2563	4414
+duk.00191.xml	leaf003v	duk.00191.004.jp2	2943	4437
+duk.00191.xml	leaf004r	duk.00191.005.jp2	2492	4404
 duk.00192.xml	leaf001r	duk.00192.001.jp2	4649	6174
 duk.00193.xml	leaf001r	duk.00193.001.jp2	3462	5203
 duk.00193.xml	leaf002r	duk.00193.002.jp2	3298	5622
-duk.00193.xml	leaf002v	duk.00193.003.jp2
+duk.00193.xml	leaf002v	duk.00193.003.jp2	840	1458
 duk.00193.xml	leaf003r	duk.00193.004.jp2	3185	5994
 duk.00193.xml	leaf003v	duk.00193.005.jp2	3313	5891
 duk.00194.xml	leaf001r	duk.00194.001.jp2	3606	5993
@@ -151,7 +151,7 @@ duk.00201.xml	leaf001v	duk.00201.002.jp2	3537	6154
 duk.00248.xml	leaf001r	duk_nhg.00343.jp2	3807	6133
 duk.00248.xml	leaf002r	duk_nhg.00344.jp2	3766	6118
 duk.00248.xml	leaf002v	duk_nhg.00345.jp2	3770	6076
-duk.00248.xml	leaf003r	duk.00248.004.jp2
+duk.00248.xml	leaf003r	duk.00248.004.jp2	3749	6100
 duk.00248.xml	leaf003v	duk_nhg.00347.jp2	3748	6090
 duk.00248.xml	leaf004r	duk_nhg.00348.jp2	3691	6086
 duk.00248.xml	leaf004v	duk_nhg.00349.jp2	3729	6090
@@ -168,7 +168,7 @@ duk.00248.xml	leaf010v	duk_nhg.00359.jp2	3787	6062
 duk.00248.xml	leaf011r	duk_nhg.00359.jp2	3787	6062
 duk.00642.xml	leaf001r	duk.00642.001.jp2	5024	7722
 duk.00642.xml	leaf002r	duk.00642.001.jp2	5024	7722
-duk.00642.xml	leaf002v	duk.00642.002.jp2
+duk.00642.xml	leaf002v	duk.00642.002.jp2	570	690
 duk.00642.xml	leaf001v	duk.00642.003.jp2	978	1500
 duk.00673.xml	leaf001r	duk.00673.001.jp2	3299	3095
 duk.00674.xml	leaf001r	duk.00673.001.jp2	3299	3095
@@ -188,36 +188,36 @@ duk.00686.xml	leaf002r	duk.00686.002.jp2	3804	4758
 duk.00687.xml	leaf001r	duk.00687.001.jp2	2868	5112
 duk.00692.xml	leaf001r	duk.00692.001.jp2	3599	5349
 duk.00692.xml	leaf002r	duk.00692.002.jp2	3663	5050
-duk.00693.xml	leaf001r	duk.00693.001.jp2
-duk.00694.xml	leaf001r	duk.00694.001.jp2
-duk.00694.xml	leaf001v	duk.00694.002.jp2
-duk.00695.xml	leaf001r	duk.00695.001.jp2
-duk.00695.xml	leaf008r	duk.00695.001.jp2
-duk.00695.xml	leaf009r	duk.00695.001.jp2
-duk.00695.xml	leaf001v	duk.00695.002.jp2
-duk.00695.xml	leaf002r	duk.00695.002.jp2
-duk.00695.xml	leaf002v	duk.00695.003.jp2
-duk.00695.xml	leaf003r	duk.00695.003.jp2
-duk.00695.xml	leaf003v	duk.00695.004.jp2
-duk.00695.xml	leaf004r	duk.00695.003.jp2
-duk.00695.xml	leaf004v	duk.00695.004.jp2
-duk.00695.xml	leaf005r	duk.00695.004.jp2
-duk.00695.xml	leaf006r	duk.00695.004.jp2
-duk.00695.xml	leaf007r	duk.00695.004.jp2
-duk.00696.xml	leaf001r	duk.00696.001.jp2
+duk.00693.xml	leaf001r	duk.00693.001.jp2	4494	6940
+duk.00694.xml	leaf001r	duk.00694.001.jp2	4528	6924
+duk.00694.xml	leaf001v	duk.00694.002.jp2	4592	6625
+duk.00695.xml	leaf001r	duk.00695.001.jp2	4637	6964
+duk.00695.xml	leaf008r	duk.00695.001.jp2	4637	6964
+duk.00695.xml	leaf009r	duk.00695.001.jp2	4637	6964
+duk.00695.xml	leaf001v	duk.00695.002.jp2	4468	6478
+duk.00695.xml	leaf002r	duk.00695.002.jp2	4468	6478
+duk.00695.xml	leaf002v	duk.00695.003.jp2	4588	6503
+duk.00695.xml	leaf003r	duk.00695.003.jp2	4588	6503
+duk.00695.xml	leaf003v	duk.00695.004.jp2	4539	6533
+duk.00695.xml	leaf004r	duk.00695.003.jp2	4588	6503
+duk.00695.xml	leaf004v	duk.00695.004.jp2	4539	6533
+duk.00695.xml	leaf005r	duk.00695.004.jp2	4539	6533
+duk.00695.xml	leaf006r	duk.00695.004.jp2	4539	6533
+duk.00695.xml	leaf007r	duk.00695.004.jp2	4539	6533
+duk.00696.xml	leaf001r	duk.00696.001.jp2	4591	6933
 duk.00696.xml	leaf002r	duk.00696.002.jp2	2558	4749
-duk.00696.xml	leaf003r	duk.00696.003.jp2
-duk.00705.xml	leaf001r	duk.00705.001.jp2
-duk.00705.xml	leaf001v	duk.00705.002.jp2
-duk.00705.xml	leaf002r	duk.00705.003.jp2
-duk.00705.xml	leaf002v	duk.00705.004.jp2
-duk.00705.xml	leaf003r	duk.00705.005.jp2
-duk.00705.xml	leaf003v	duk.00705.006.jp2
-duk.00705.xml	leaf004r	duk.00705.007.jp2
-duk.00705.xml	leaf004v	duk.00705.008.jp2
+duk.00696.xml	leaf003r	duk.00696.003.jp2	4582	6973
+duk.00705.xml	leaf001r	duk.00705.001.jp2	4458	6477
+duk.00705.xml	leaf001v	duk.00705.002.jp2	4389	6257
+duk.00705.xml	leaf002r	duk.00705.003.jp2	4396	6425
+duk.00705.xml	leaf002v	duk.00705.004.jp2	4350	6186
+duk.00705.xml	leaf003r	duk.00705.005.jp2	4413	6470
+duk.00705.xml	leaf003v	duk.00705.006.jp2	4349	6234
+duk.00705.xml	leaf004r	duk.00705.007.jp2	4724	6892
+duk.00705.xml	leaf004v	duk.00705.008.jp2	4538	6489
 duk.00707.xml	leaf001r	duk.00707.001.jp2	3183	2707
 loc.03398.xml	leaf001r	loc_nhg.00034.jp2	2912	4368
-loc.03398.xml	leaf001v	loc.03398.002.jp2
+loc.03398.xml	leaf001v	loc.03398.002.jp2	4368	2912
 loc.03399.xml	leaf001r	loc_nhg.00036.jp2	1701	2687
 loc.03399.xml	leaf001v	loc_nhg.00038.jp2	2912	4368
 loc.03399.xml	leaf002r	loc_nhg.00037.jp2	2912	4368
@@ -529,17 +529,6 @@ loc.03805.xml	leaf002r	loc.03805.001.jp2	2037	2629
 loc.03805.xml	leaf001v	loc.03805.002.jp2	1989	2553
 mid.00006.xml	leaf001v	mid.00006.001.jp2	3680	5816
 mid.00006.xml	leaf002r	mid.00006.002.jp2	3680	5816
-mid.00007.xml	leaf001r	mid.00007.001.jp2	3680	5816
-mid.00007.xml	leaf001v	mid.00007.002.jp2	3680	5816
-mid.00007.xml	leaf002r	mid.00007.003.jp2	3680	5816
-mid.00007.xml	leaf002v	mid.00007.004.jp2	3680	5816
-mid.00007.xml	leaf003r	mid.00007.004.jp2	3680	5816
-mid.00007.xml	leaf004v	mid.00007.006.jp2
-mid.00007.xml	leaf005r	mid.00007.007.jp2
-mid.00007.xml	leaf005v	mid.00007.008.jp2
-mid.00007.xml	leaf006r	mid.00007.009.jp2
-mid.00007.xml	leaf006v	mid.00007.005.jp2	3680	5816
-mid.00007.xml	leaf007r	mid.00007.005.jp2	3680	5816
 mid.00009.xml	leaf001r	mid.00009.001.jp2	3635	5907
 mid.00009.xml	leaf001v	mid.00009.002.jp2	3635	5907
 mid.00009.xml	leaf002r	mid.00009.003.jp2	3635	5907
@@ -580,11 +569,11 @@ mid.00016.xml	leaf002r	mid.00016.001.jp2	3650	5877
 mid.00018.xml	leaf001r	mid.00018.001.jp2	3560	5907
 mid.00018.xml	leaf002r	mid.00018.002.jp2	3500	5877
 mid.00019.xml	leaf001r	mid.00019.001.jp2	3500	5666
-nyp.00027.xml	leaf001r	nyp.00027.001.jp2
-nyp.00030.xml	leaf001r	nyp.00030.001.jp2
-nyp.00031.xml	leaf001r	nyp.00031.001.jp2
-nyp.00035.xml	leaf001r	nyp.00035.001.jp2
-nyp.00392.xml	leaf001r	nyp.00392.001.jp2
+nyp.00027.xml	leaf001r	nyp.00027.001.jp2	3012	1869
+nyp.00030.xml	leaf001r	nyp.00030.001.jp2	3657	1564
+nyp.00031.xml	leaf001r	nyp.00031.001.jp2	3687	1141
+nyp.00035.xml	leaf001r	nyp.00035.001.jp2	2399	3613
+nyp.00392.xml	leaf001r	nyp.00392.001.jp2	3749	1552
 tex.00350.xml	leaf001v	tex.00350.001.jp2	2550	3502
 tex.00350.xml	leaf002r	tex.00350.001.jp2	2550	3502
 tex.00350.xml	leaf003r	tex.00350.001.jp2	2550	3502
@@ -646,8 +635,8 @@ yal.00345.xml	leaf014r	yal_nhg.00020.jp2	5096	5774
 yal.00345.xml	leaf015r	yal_nhg.00021.jp2	5172	5692
 yal.00345.xml	leaf016r	yal_nhg.00022.jp2	5107	5742
 yal.00345.xml	leaf017r	yal_nhg.00023.jp2	5823	5220
-yal.00345.xml	leaf018r	yal.00345.001_large.jp2
-yal.00345.xml	leaf018v	yal.00345.002_large.jp2
+yal.00345.xml	leaf018r	yal.00345.001_large.jp2	4990	2711
+yal.00345.xml	leaf018v	yal.00345.002_large.jp2	4924	2706
 yal.00345.xml	leaf019r	yal_nhg.00024.jp2	5950	4938
 yal.00345.xml	leaf020r	yal_nhg.00025.jp2	5297	5696
 yal.00345.xml	leaf021r	yal_nhg.00026.jp2	4938	5950
@@ -664,13 +653,3 @@ yal.00345.xml	leaf031r	yal_nhg.00036.jp2	4938	5950
 yal.00345.xml	leaf032r	yal_nhg.00037.jp2	5572	5173
 yal.00345.xml	leaf033r	yal_nhg.00037.jp2	5572	5173
 yal.00345.xml	leaf032v	yal_nhg.00038.jp2	5696	5297
-yal.00368.xml	leaf001r	yal.00368.001.jp2
-yal.00368.xml	leaf001v	yal.00368.002.jp2
-yal.00368.xml	leaf001v	yal.00368.003_large.jp2
-yal.00368.xml	leaf001v	yal.00368.004_large.jp2
-yal.00368.xml	leaf001v	yal.00368.005_large.jp2
-yal.00368.xml	leaf001v	yal.00368.006_large.jp2
-yal.00368.xml	leaf002r	yal.00368.007_large.jp2
-yal.00368.xml	leaf002v	yal.00368.008.jp2
-yal.00368.xml	leaf003r	yal.00368.009.jp2
-yal.00368.xml	leaf003v	yal.00368.010.jp2
