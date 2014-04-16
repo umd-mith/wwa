@@ -69,9 +69,19 @@
       <xsl:attribute name="target" select="descendant::*[@target][1]/@target"/>
       <xsl:apply-templates select="@* except @target | node()"/>
     </xsl:copy>
-  </xsl:template>  
+  </xsl:template>   
   
-  <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']]">
+  
+  <!-- Avoid lines only containing marginalia -->
+  <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]"/>
+  <xsl:template match="tei:line[following-sibling::tei:line[1][descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]]">
+    <xsl:copy>
+      <xsl:attribute name="xml:id" select="following-sibling::tei:line[1]/descendant::tei:anchor[@type='marginalia']/@xml:id"/>
+      <xsl:apply-templates select="@* except @xml:id | node()"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']][not(normalize-space()='') or not(count(*)=1)]">
     <xsl:copy>
       <xsl:attribute name="xml:id" select="descendant::tei:anchor[@type='marginalia']/@xml:id"/>
       <xsl:apply-templates select="@* except @xml:id | node()"/>
