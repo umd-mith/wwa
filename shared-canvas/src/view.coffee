@@ -308,8 +308,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       canvasWidth = null
       canvasHeight = null
 
-      # Is this needed??
-      baseFontSize = 150 # in terms of the SVG canvas size - about 15pt
+      baseFontSize = 110 # in terms of the image size - about 15pt
       DivHeight = null
       DivWidth = Math.floor(@$el.width()*20/20)
       @$el.height(Math.floor(@$el.width() * 4 / 3))
@@ -409,10 +408,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         overflow: 'auto'
         position: 'absolute'
 
-      @$el.addClass("text-content")
-      @$el.attr("id", @model.get("@id"))
-      @$el.css
+      rootEl = $("<div></div>")
+      $(rootEl).addClass("text-content")
+      $(rootEl).attr("id", @model.get("@id"))
+      $(rootEl).css
         "white-space": "nowrap"
+
+      @$el.append(rootEl)
 
       #
       # If we're not given an offset and size, then we assume that we're
@@ -457,7 +459,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       #      
       new TextAnnotationsView
         collection: @model.textItems
-        el: @el
+        el: rootEl
         vars : @variables.variables # Pass on properties set in this view
 
       @
@@ -592,9 +594,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         when "sgaAdditionAnnotation" in type
 
           # Parse additions first, as they might require an extra line
-          # or be marginal additions
-
-          if model.get("marginalia_on")?
+          # or be marginal additions.
+          # Also make sure the marginal addition actually has text in it
+          if model.get("marginalia_on")? and model.get("text").replace(/^\s+$/, "") != ""
             @currentLineEl.parent().attr
               'id' : model.get("marginalia_on")
 
@@ -606,10 +608,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             @currentLineEl.parent().width _w
 
             # If scrollbar plugin has been applied to the parent content zone, remove it.
-            if @currentLineEl.parent().perfectScrollbar?
-              @currentLineEl.parent().perfectScrollbar 'destroy'
+            if @currentLineEl.parent().parent().perfectScrollbar?
+              @currentLineEl.parent().parent().perfectScrollbar 'destroy'
 
-            @currentLineEl.parent().css
+            @currentLineEl.parent().parent().css
               "overflow" : "hidden"
 
           
@@ -678,7 +680,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             annotation.css 
               "top" : _currentLineEl.offset().top - start_offset
 
-            @$el.on "scroll", =>
+            @$el.parent().on "scroll", =>
               annotation.css 
                 "top" : _currentLineEl.offset().top - start_offset
 
@@ -701,8 +703,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         @variables.set('scrollWidth', @el.scrollWidth)
 
       # Update scrollbar styling if plugin exists
-      if @$el.perfectScrollbar?
-        @$el.perfectScrollbar('update')
+      if @$el.parent().perfectScrollbar?
+        @$el.parent().perfectScrollbar('update')
 
   class TextAnnoView extends AreaView
     tagName: "span"
