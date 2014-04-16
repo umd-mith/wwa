@@ -115,4 +115,13 @@
     <xsl:apply-templates select="node()"/>
   </xsl:template>
   
+  <!-- Handshifts are only supported at line level for now. Always bring it at the very beginning -->
+  <xsl:template match="tei:line[tei:handShift]">
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+      <xsl:apply-templates select="tei:handShift"/>
+      <xsl:apply-templates select="node() except tei:handShift"/>
+    </xsl:copy>
+  </xsl:template>
+  
 </xsl:stylesheet>
