@@ -409,13 +409,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         overflow: 'auto'
         position: 'absolute'
 
-      rootEl = $("<div></div>")
-      $(rootEl).addClass("text-content")
-      $(rootEl).attr("id", @model.get("@id"))
-      $(rootEl).css
+      @$el.addClass("text-content")
+      @$el.attr("id", @model.get("@id"))
+      @$el.css
         "white-space": "nowrap"
-
-      @$el.append(rootEl)
 
       #
       # If we're not given an offset and size, then we assume that we're
@@ -448,7 +445,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       if @$el.perfectScrollbar?
         @$el.css
           overflow: 'hidden'
-        @$el.perfectScrollbar()
+        @$el.perfectScrollbar
+          suppressScrollX: true
+          includePadding: true
+          scrollYMarginOffset: 20
 
       #
       # Here we embed the text-based view.
@@ -457,7 +457,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       #      
       new TextAnnotationsView
         collection: @model.textItems
-        el: rootEl
+        el: @el
         vars : @variables.variables # Pass on properties set in this view
 
       @
@@ -611,10 +611,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             @currentLineEl.parent().width _w
 
             # If scrollbar plugin has been applied to the parent content zone, remove it.
-            if @currentLineEl.parent().parent().perfectScrollbar?
-              @currentLineEl.parent().parent().perfectScrollbar 'destroy'
+            if @currentLineEl.parent().perfectScrollbar?
+              @currentLineEl.parent().perfectScrollbar 'destroy'
 
-            @currentLineEl.parent().parent().css
+            @currentLineEl.parent().css
               "overflow" : "hidden"
 
           
@@ -683,7 +683,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             annotation.css 
               "top" : _currentLineEl.offset().top - start_offset
 
-            @$el.parent().on "scroll", =>
+            @$el.on "scroll", =>
               annotation.css 
                 "top" : _currentLineEl.offset().top - start_offset
 
@@ -706,8 +706,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         @variables.set('scrollWidth', @el.scrollWidth)
 
       # Update scrollbar styling if plugin exists
-      if @$el.parent().perfectScrollbar?
-        @$el.parent().perfectScrollbar('update')
+      if @$el.perfectScrollbar?
+        @$el.perfectScrollbar('update')
 
   class TextAnnoView extends AreaView
     tagName: "span"
