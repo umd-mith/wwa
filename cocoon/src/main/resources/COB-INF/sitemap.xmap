@@ -130,8 +130,14 @@
         <map:serialize type="xml"/>
       </map:match>
       
-      <map:match pattern="split/*">
+      <map:match pattern="handshifts/*">
         <map:generate src="cocoon:/cleanup/{1}"/>
+        <map:transform src="xslt/handshifts.xsl" type="saxon"/>
+        <map:serialize type="xml"/>
+      </map:match>
+      
+      <map:match pattern="split/*">
+        <map:generate src="cocoon:/handshifts/{1}"/>
         <map:transform src="xslt/splitSurfaces.xsl" type="saxon">
           <map:parameter name="destFolder" value="{contextpath:/}xml/processed/"/>
         </map:transform>
@@ -148,7 +154,7 @@
       </map:match>
 
       <map:match pattern="convert_nosplit/*">
-        <map:generate src="cocoon:/cleanup/{1}"/>
+        <map:generate src="cocoon:/handshifts/{1}"/>
         <map:serialize type="xml"/>
       </map:match> 
       
