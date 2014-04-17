@@ -74,7 +74,7 @@
   
   <!-- Avoid lines only containing marginalia -->
   <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]"/>
-  <xsl:template match="tei:line[following-sibling::tei:line[1][descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]]">
+  <xsl:template match="tei:line[not(descendant::tei:anchor[@type='marginalia'])][following-sibling::tei:line[1][descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]]">
     <xsl:copy>
       <xsl:attribute name="xml:id" select="following-sibling::tei:line[1]/descendant::tei:anchor[@type='marginalia']/@xml:id"/>
       <xsl:apply-templates select="@* except @xml:id | node()"/>
@@ -113,15 +113,6 @@
   
   <xsl:template match="tei:add[@hand='']">
     <xsl:apply-templates select="node()"/>
-  </xsl:template>
-  
-  <!-- Handshifts are only supported at line level for now. Always bring it at the very beginning -->
-  <xsl:template match="tei:line[tei:handShift]">
-    <xsl:copy>
-      <xsl:apply-templates select="@*"/>
-      <xsl:apply-templates select="tei:handShift"/>
-      <xsl:apply-templates select="node() except tei:handShift"/>
-    </xsl:copy>
   </xsl:template>
   
 </xsl:stylesheet>
