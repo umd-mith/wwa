@@ -628,13 +628,14 @@ SGASharedCanvas.Data = SGASharedCanvas.Data or {}
             resource = manifest.resources.find (res) ->
               res.get("resource") == id_graph[target]["full"]
 
-            manifest.searchResults.add
-              "@id" : node["@id"]
-              "@type" : node["@type"]
-              "target": id_graph[target]["full"]
-              "beginOffset" : id_graph[selector]["beginOffset"]
-              "endOffset" : id_graph[selector]["endOffset"]
-              "canvas_id" : resource.get("on") # For slider component
+            if resource?
+              manifest.searchResults.add
+                "@id" : node["@id"]
+                "@type" : node["@type"]
+                "target": id_graph[target]["full"]
+                "beginOffset" : id_graph[selector]["beginOffset"]
+                "endOffset" : id_graph[selector]["endOffset"]
+                "canvas_id" : resource.get("on") # For slider component
 
       manifest.searchResults.trigger 'sync'
 
