@@ -135,9 +135,10 @@ class GSAContentHandler(xml.sax.ContentHandler):
 
         if "hand" in attrs:
             hand = attrs["hand"]
-            if hand[0]=="#": hand = hand[1:]
-            self.hands.append(hand)
-            self.path[-1][-1] = hand
+            if len(hand) > 0:
+                if hand[0]=="#": hand = hand[1:]
+                self.hands.append(hand)
+                self.path[-1][-1] = hand
 
         if "type" in attrs:
             if attrs["type"] == "library":
