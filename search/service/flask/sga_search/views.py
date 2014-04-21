@@ -11,14 +11,56 @@ sga_search.jinja_env.globals['static'] = (
 @sga_search.route('/')
 @sga_search.route('/index')
 def index():
-    return """<!DOCTYPE html><html><head><title>SGA Search manager</title><p>Hic sunt leones.
+    return sga_search.send_static_file('demo/index.html')
+    # return """<!DOCTYPE html><html><head><title>SGA Search manager</title><p>Hic sunt leones.
 
-    <ul>
-        <li><a href="search?f=text&q=homer">Test search results</a>
-        <li><a href="annotate?f=text&q=homer">Test search annotation</a>
-    </ul>
+    # <ul>
+    #     <li><a href="annotate?f=text&q=feelings">Test search annotation</a>
+    # </ul>
 
-    """
+    # """
+
+
+import os
+@sga_search.route('/demo/<path:path>')
+def static_proxy_demo(path):
+    # send_static_file will guess the correct MIME type
+    return sga_search.send_static_file(os.path.join('demo', path))
+
+@sga_search.route('/client/<path:path>')
+def static_proxy_client(path):
+    # send_static_file will guess the correct MIME type
+    return sga_search.send_static_file(os.path.join('client', path))
+
+# @sga_search.route('/manifests/<path:path>')
+# def static_proxy_manifests(path):
+#     # send_static_file will guess the correct MIME type
+#     return sga_search.send_static_file(os.path.join('manifests', path))
+
+# @sga_search.route('/xml/<path:path>')
+# def static_proxy_xml(path):
+#     # send_static_file will guess the correct MIME type
+#     return sga_search.send_static_file(os.path.join('xml', path))
+
+# @sga_search.route('/css/<path:path>')
+# def static_proxy_css(path):
+#     # send_static_file will guess the correct MIME type
+#     return sga_search.send_static_file(os.path.join('css', path))
+
+# @sga_search.route('/font/<path:path>')
+# def static_proxy_font(path):
+#     # send_static_file will guess the correct MIME type
+#     return sga_search.send_static_file(os.path.join('font', path))
+
+# @sga_search.route('/images/<path:path>')
+# def static_proxy_images(path):
+#     # send_static_file will guess the correct MIME type
+#     return sga_search.send_static_file(os.path.join('images', path))
+
+# @sga_search.route('/example-manifest.jsonld')
+# def static_proxy_manifest():
+#     # send_static_file will guess the correct MIME type
+#     return sga_search.send_static_file('example-manifest.jsonld')
 
 @sga_search.route('/search', methods = ['GET'])
 @crossdomain.crossdomain(origin='*')
@@ -49,7 +91,7 @@ def search():
         response = s.raw_query(q=fields[0]+":"+q, 
             q_op='AND',
             # fl='shelfmark,id,work,viewer_url,authors,attribution,shelf_label', 
-            fl='shelfmark,id', 
+            fl='shelfmark,id,viewer_url', 
             fq=fqs, 
             wt='json', 
             start=start,
@@ -93,13 +135,13 @@ def search():
             res = res_orig.copy()
 
             # metadata
-            # results["metadata"][res["shelfmark"]] = {
+            results["metadata"][res["shelfmark"]] = {
             #     "shelf_label":res["shelf_label"],
             #     "work":res["work"],
-            #     "viewer_url":res["viewer_url"],
+                "viewer_url":res["viewer_url"],
             #     "authors":res["authors"],
             #     "attribution":res["attribution"]
-            # }
+            }
 
             ident = res["id"]            
 
