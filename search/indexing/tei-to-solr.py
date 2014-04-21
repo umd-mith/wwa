@@ -47,7 +47,7 @@ class Doc :
         self.solr.add(id=self.doc_id, 
             shelfmark=self.shelfmark, 
             # shelf_label=self.shelf_label,
-            # viewer_url = self.viewer_url,
+            viewer_url = self.viewer_url,
             # work=self.work,
             # authors=self.authors,
             # attribution=self.attribution,
@@ -132,13 +132,17 @@ class GSAContentHandler(xml.sax.ContentHandler):
             #             self.doc.authors = manifests[mk]["metadata"][0]["value"]
             #             self.doc.attribution = manifests[mk]["attribution"]
             #             self.doc.shelfmark = manifests[mk]["label"]
+            parts = self.doc.doc_id.split('-')
+            self.doc.viewer_url = "/demo/?mf=%s#/p%d/" % (parts[0], int(parts[1]))
+            self.doc.shelfmark = parts[0]
 
         if "hand" in attrs:
-            hand = attrs["hand"]
-            if len(hand) > 0:
-                if hand[0]=="#": hand = hand[1:]
-                self.hands.append(hand)
-                self.path[-1][-1] = hand
+            if not (name == "hi" and attrs["hand"] == "#ww"):
+                hand = attrs["hand"]
+                if len(hand) > 0:
+                    if hand[0]=="#": hand = hand[1:]
+                    self.hands.append(hand)
+                    self.path[-1][-1] = hand
 
         if "type" in attrs:
             if attrs["type"] == "library":
@@ -196,12 +200,13 @@ class GSAContentHandler(xml.sax.ContentHandler):
                     self.doc.mod_pos["hi"][-1] += str(self.pos)
 
         if name == "handShift":
-            if "new" in attrs:
-                self.handShift = True
+            if "new" in attrs:                
                 hand = attrs["new"]
                 if hand[0]=="#": hand = hand[1:]
-                self.hands.append(hand)
-                self.path[-1][-1] = hand
+                if hand == "ww": 
+                    self.handShift = True
+                    self.hands.append(hand)
+                    self.path[-1][-1] = hand
 
                 # print self.hands, self.path
 
