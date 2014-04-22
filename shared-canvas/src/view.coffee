@@ -343,7 +343,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           DivHeight = Math.floor(canvasHeight * s)
         container.css
           'font-size': (Math.floor(baseFontSize * s * 10) / 10) + "px"
-          'line-height': (Math.floor(baseFontSize * s * 11.5) / 10) + "px"
+          'line-height': parseInt(@$el.css('font-size')) * 1.5 + "px"
           'height': DivHeight
           'width': DivWidth
 
@@ -879,7 +879,6 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       @variables.set 'active', true
 
       baseURL = @model.get("service") + "?url_ver=Z39.88-2004&rft_id=" + @model.get("@id")
-      tempBaseURL = baseURL.replace(/http:\/\/tiles2\.bodleian\.ox\.ac\.uk:8080\//, '/')
 
       @setZoom = (z) ->
 
@@ -889,7 +888,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       offsetY = 0
 
       $.ajax
-        url: tempBaseURL + "&svc_id=info:lanl-repo/svc/getMetadata"
+        url: baseURL + "&svc_id=info:lanl-repo/svc/getMetadata"
         success: (metadata) =>
           # original{Width,Height} are the size of the full jp2 image - the maximum resolution            
           originalWidth = Math.floor(metadata.width) || 1
@@ -934,8 +933,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             divWidth = @$el.width() || 1
             if @variables.get("scale")? > 0
               baseZoomLevel = Math.max(0, Math.ceil(-Math.log( @variables.get("scale") * imgScale )/Math.log(2)))
-              @variables.set 'minZoom', 0
-              @variables.set 'maxZoom', zoomLevels - baseZoomLevel
+              @variables.set 'minZoom', baseZoomLevel
+              @variables.set 'maxZoom', zoomLevels
 
           wrapWithImageReplacement = (cb) ->
             cb()
@@ -1067,7 +1066,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
             }
 
           renderTile = (o) =>
-            z = Math.ceil(zoomLevel + baseZoomLevel)                
+            z = Math.ceil(zoomLevel + baseZoomLevel)  
             topLeft = screenCoords(o.x, o.y)
             heightWidth = screenExtents(o.x, o.y)
 
