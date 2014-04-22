@@ -146,13 +146,11 @@
                     </xsl:copy>            
                 </add>
             </xsl:when>
+            <xsl:when test="not(@type='authorial')"/>
             <xsl:otherwise>
                 <anchor xmlns="http://www.tei-c.org/ns/1.0" type="marginalia" xml:id="{generate-id()}"/>
             </xsl:otherwise>
         </xsl:choose>
-        <xsl:if test="not(@type='authorial') and not(@place)">
-            
-        </xsl:if>
     </xsl:template>
     
     <!--<xsl:template match="tei:lb[ancestor::tei:zone[not(descendant::tei:fw)]][following::tei:note[ancestor::tei:text][@type='authorial'][@place]]">
@@ -184,7 +182,15 @@
             <xsl:attribute name="lrx">4200</xsl:attribute>
             <xsl:attribute name="lry">6000</xsl:attribute>
             <xsl:attribute name="wwa:was"><xsl:text>tei:pb</xsl:text></xsl:attribute>
-            <xsl:apply-templates select="@*"/>
+            <xsl:attribute name="facs">
+                <xsl:analyze-string select="@facs" regex="(.*)\.\w+"> <!-- important, keep lazy! -->
+                    <xsl:matching-substring>
+                        <xsl:value-of select="regex-group(1)"/>
+                        <xsl:text>.jp2</xsl:text>
+                    </xsl:matching-substring>
+                </xsl:analyze-string>
+            </xsl:attribute>
+            <xsl:apply-templates select="@* except @facs"/>
             
             <graphic xmlns="http://www.tei-c.org/ns/1.0" url="{@facs}"/>
             
@@ -329,13 +335,19 @@
             <line xmlns="http://www.tei-c.org/ns/1.0"><xsl:apply-templates select="@*|node()"/></line>
         </xsl:copy>-->        
     </xsl:template>
-    <xsl:template match="tei:lb[ancestor::tei:zone[descendant::tei:fw]]"/>
+<!--    <xsl:template match="tei:lb[ancestor::tei:zone[descendant::tei:fw]]"/>-->
     
     <xsl:template match="tei:fw[contains(@place,'top')]">
         <zone type="running_head" xmlns="http://www.tei-c.org/ns/1.0">
             <xsl:apply-templates select="node()"/>
         </zone>
     </xsl:template>
+    
+    <!--<xsl:template match="tei:fw[contains(@place,'bottom')]">
+        <zone type="running_head_bottom" xmlns="http://www.tei-c.org/ns/1.0">
+            <xsl:apply-templates select="node()"/>
+        </zone>
+    </xsl:template>-->
     
     <!-- when there are no columns, make the only zone a "main" zone -->
     <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)][not(@type='pasteon')]">
