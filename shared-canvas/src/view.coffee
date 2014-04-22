@@ -342,8 +342,6 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         if canvasWidth? and canvasHeight?
           DivHeight = Math.floor(canvasHeight * s)
         container.css
-          'font-size': (Math.floor(baseFontSize * s * 10) / 10) + "px"
-          'line-height': parseInt(@$el.css('font-size')) * 1.5 + "px"
           'height': DivHeight
           'width': DivWidth
 
