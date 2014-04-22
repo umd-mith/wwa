@@ -183,6 +183,13 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         include: ['hand-library', 'hand-comp']
         defLimiter: 'hand-mws'
 
+      # Spinner (temp)
+      $('#loading-progress').css
+        position: "absolute"
+        "z-index": "10000"
+        top: "50%"
+        left: "50%"
+
       @
 
   # Canvases view
@@ -193,7 +200,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
     addOne: (c) ->
       # Only trigger views once the model contains canvas data (but not subcollections yet)
+      $('#loading-progress').show()
       @listenToOnce c, 'sync', =>
+        $('#loading-progress').hide()
         new CanvasView 
           model: c
           filter: @filter
@@ -450,7 +459,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
         @$el.perfectScrollbar
           suppressScrollX: true
           includePadding: true
-          scrollYMarginOffset: 20
+          scrollYMarginOffset: 10
 
       #
       # Here we embed the text-based view.
