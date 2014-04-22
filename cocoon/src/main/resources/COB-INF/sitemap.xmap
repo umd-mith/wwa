@@ -107,8 +107,14 @@
         <map:serialize type="xml"/>
       </map:match>
       
-      <map:match pattern="computeGrid/*">
+      <map:match pattern="orfans/*">
         <map:generate src="cocoon:/convert/{1}"/>
+        <map:transform src="xslt/wrapOrfans.xsl" type="saxon"/>
+        <map:serialize type="xml"/>
+      </map:match>
+      
+      <map:match pattern="computeGrid/*">
+        <map:generate src="cocoon:/orfans/{1}"/>
         <map:transform src="xslt/computeGrid.xsl" type="saxon"/>
         <map:serialize type="xml"/>
       </map:match>
