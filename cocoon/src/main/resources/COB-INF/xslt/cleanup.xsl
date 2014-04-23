@@ -33,7 +33,29 @@
     <xsl:apply-templates select="node()"/>
   </xsl:template>
   
-  <xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:zone[normalize-space()='']]"/>
+  <xsl:template match="tei:surface">
+    <xsl:choose>
+      <xsl:when test="normalize-space()='' and count(*)=1 and tei:zone[normalize-space()='']"/>
+      <xsl:when test="normalize-space()='' and count(*)=0"/>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:if test="@facs">
+            <xsl:attribute name="facs">
+              <xsl:analyze-string select="@facs" regex="(.*)\.\w+"> <!-- important, keep lazy! -->
+                <xsl:matching-substring>
+                  <xsl:value-of select="regex-group(1)"/>
+                  <xsl:text>.jp2</xsl:text>
+                </xsl:matching-substring>
+              </xsl:analyze-string>
+            </xsl:attribute>
+          </xsl:if>          
+          <xsl:apply-templates select="@* except @facs|node()"/>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!--<xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:zone[normalize-space()='']]"/>-->
   
   <xsl:template match="tei:zone[@type='main'][normalize-space()=''][distinct-values(*/local-name())='line']"/>
   
@@ -74,6 +96,7 @@
   
   <!-- Avoid lines only containing marginalia -->
   <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]"/>
+  <xsl:template match="tei:line[tei:add[@source]][normalize-space()=''][count(*)=1]"/>
   <xsl:template match="tei:line[not(descendant::tei:anchor[@type='marginalia'])][following-sibling::tei:line[1][descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]]">
     <xsl:copy>
       <xsl:attribute name="xml:id" select="following-sibling::tei:line[1]/descendant::tei:anchor[@type='marginalia']/@xml:id"/>
