@@ -182,17 +182,18 @@
             <xsl:attribute name="lrx">4200</xsl:attribute>
             <xsl:attribute name="lry">6000</xsl:attribute>
             <xsl:attribute name="wwa:was"><xsl:text>tei:pb</xsl:text></xsl:attribute>
-            <xsl:attribute name="facs">
-                <xsl:analyze-string select="@facs" regex="(.*)\.\w+"> <!-- important, keep lazy! -->
-                    <xsl:matching-substring>
-                        <xsl:value-of select="regex-group(1)"/>
-                        <xsl:text>.jp2</xsl:text>
-                    </xsl:matching-substring>
-                </xsl:analyze-string>
-            </xsl:attribute>
-            <xsl:apply-templates select="@* except @facs"/>
+            <xsl:apply-templates select="@*"/>
             
-            <graphic xmlns="http://www.tei-c.org/ns/1.0" url="{@facs}"/>
+            <graphic xmlns="http://www.tei-c.org/ns/1.0">
+                <xsl:attribute name="url">
+                    <xsl:analyze-string select="@facs" regex="(.*)\.\w+"> <!-- important, keep lazy! -->
+                        <xsl:matching-substring>
+                            <xsl:value-of select="regex-group(1)"/>
+                            <xsl:text>.jp2</xsl:text>
+                        </xsl:matching-substring>
+                    </xsl:analyze-string>
+                </xsl:attribute>
+            </graphic>
             
             <!-- Top-level annotations -->
             
@@ -324,7 +325,7 @@
     <!-- Ignore the following columns -->
     <xsl:template match="tei:zone[descendant::tei:cb][preceding-sibling::tei:zone[descendant::tei:cb]]"/>
     
-    <xsl:template match="tei:zone[descendant::tei:fw]">
+    <xsl:template match="tei:zone[descendant::tei:fw][not(@type='pasteon')]">
         <xsl:apply-templates/>
         <!--<xsl:copy>
             <xsl:choose>
@@ -337,7 +338,16 @@
     </xsl:template>
 <!--    <xsl:template match="tei:lb[ancestor::tei:zone[descendant::tei:fw]]"/>-->
     
-    <xsl:template match="tei:fw[contains(@place,'top')]">
+    <!-- Deal with nested pasteons (FLAT ONLY) -->
+    <xsl:template match="tei:add[@rend='pasteon'][ancestor::tei:zone[@type='pasteon']]">
+        <xsl:apply-templates select="node()"/>
+    </xsl:template>
+    <xsl:template match="tei:floatingText[ancestor::tei:zone[@type='pasteon']]">
+        <xsl:apply-templates select="node()"/>
+    </xsl:template>
+    
+    <xsl:template match="tei:fw[contains(@place,'top')][not(ancestor::tei:zone[@type='pasteon'])]">
+        <!-- kill nested running heads for now, no SC support -->
         <zone type="running_head" xmlns="http://www.tei-c.org/ns/1.0">
             <xsl:apply-templates select="node()"/>
         </zone>
