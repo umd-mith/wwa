@@ -139,6 +139,9 @@
     <!-- make notes into additions -->
     <xsl:template match="tei:note[ancestor::tei:text]">
         <xsl:choose>
+            <xsl:when test="ancestor::tei:zone[@type='pasteon'] and @place='top'">
+                <xsl:apply-templates select="node()"/>
+            </xsl:when>
             <xsl:when test="not(@type='authorial') and not(@place)">
                 <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
                     <xsl:copy>
@@ -232,7 +235,7 @@
                     </xsl:for-each>
                     <!-- Or on top without columns (defaults to left) -->
                     <xsl:if test="not(descendant::tei:cb)">
-                        <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top']">
+                        <xsl:for-each select="descendant::tei:note[@type='authorial'][not(ancestor::tei:zone[@type='pasteon'])][tokenize(@place, ' ')='top']">
                             <zone type="top_marginalia_left" xmlns="http://www.tei-c.org/ns/1.0" >
                                 <xsl:call-template name="noteToAdd"/>   
                             </zone>
