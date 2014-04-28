@@ -15,7 +15,7 @@
         </xsl:copy>
     </xsl:template> 
     
-    <xsl:template match="tei:div1[@type='pasteon']">
+    <xsl:template match="tei:div1[@type=('pasteon', 'section')]">
         <xsl:apply-templates select="node()"/>
     </xsl:template>
     
