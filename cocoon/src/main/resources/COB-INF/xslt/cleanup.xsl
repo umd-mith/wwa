@@ -14,24 +14,56 @@
     </xsl:copy>
   </xsl:template>
   
-  <!-- remove empty lines -->
-  <xsl:template match="tei:line[normalize-space()=''][count(*)=1][tei:lb]"/>
-  <xsl:template match="tei:line[normalize-space()=''][count(*)=0]"/>
-  
-  <xsl:template match="tei:line[tei:graphic]">
-    <xsl:apply-templates select="tei:graphic"/>
-  </xsl:template>
-  
-  <xsl:template match="tei:line[normalize-space()=''][count(*)=2][tei:lb][tei:milestone]
-    | tei:line[normalize-space()=''][count(*)=1][tei:milestone]">
-    <xsl:apply-templates select="tei:milestone"/>
+  <xsl:template match="tei:line">
+    <xsl:choose>
+      <!-- remove empty lines -->
+      <xsl:when test="normalize-space()='' and count(*)=1 and tei:lb"/>
+      <xsl:when test="normalize-space()='' and count(*)=0"/>
+      <xsl:when test="tei:anchor[@type='marginalia'] and normalize-space()='' and count(*)=1"/>
+      <xsl:when test="tei:add[@source] and normalize-space()='' and count(*)=1"/>
+      <xsl:when test="tei:graphic">
+        <xsl:apply-templates select="tei:graphic"/>
+      </xsl:when>
+      <xsl:when test="(normalize-space()='' and count(*)=2 and tei:lb and tei:milestone)
+        or (normalize-space()='' and count(*)=1 and tei:milestone)">
+        <xsl:apply-templates select="tei:milestone"/>
+      </xsl:when>
+      <xsl:when test="following-sibling::tei:line[1][normalize-space()=''][count(*)=1][
+        tei:line[normalize-space()=''][count(*)=1][tei:anchor[@type='marginalia']]
+        ]">
+        <xsl:copy>
+          <xsl:attribute name="xml:id" select="following-sibling::tei:line[1][normalize-space()=''][count(*)=1]/
+            tei:line[normalize-space()=''][count(*)=1][tei:anchor[@type='marginalia']]
+            /tei:anchor/@xml:id"/>
+          <xsl:apply-templates select="@* except @xml:id | node()"/>
+        </xsl:copy>
+      </xsl:when>
+      <xsl:when test="tei:line">
+        <xsl:apply-templates select="node()"/>
+      </xsl:when>      
+      <xsl:when test="not(descendant::tei:anchor[@type='marginalia']) and following-sibling::tei:line[1][descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]">
+        <xsl:copy>
+          <xsl:attribute name="xml:id" select="following-sibling::tei:line[1]/descendant::tei:anchor[@type='marginalia']/@xml:id"/>
+          <xsl:apply-templates select="@* except @xml:id | node()"/>
+        </xsl:copy>
+      </xsl:when>
+      <xsl:when test="descendant::tei:anchor[@type='marginalia'] and not(normalize-space()='') or not(count(*)=1)">
+        <xsl:copy>
+          <xsl:if test="descendant::tei:anchor[@type='marginalia']/@xml:id">
+            <xsl:attribute name="xml:id" select="descendant::tei:anchor[@type='marginalia']/@xml:id"/>
+          </xsl:if>          
+          <xsl:apply-templates select="@* except @xml:id | node()"/>
+        </xsl:copy>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:template match="tei:lb"/>
-  
-  <xsl:template match="tei:line[tei:line]">
-    <xsl:apply-templates select="node()"/>
-  </xsl:template>
   
   <xsl:template match="tei:surface">
     <xsl:choose>
@@ -57,59 +89,40 @@
   
   <!--<xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:zone[normalize-space()='']]"/>-->
   
-  <xsl:template match="tei:zone[@type='main'][normalize-space()=''][distinct-values(*/local-name())='line']"/>
-  
-  <xsl:template match="tei:zone[not(*)]"/>
+  <xsl:template match="tei:zone">
+    <xsl:choose>
+      <xsl:when test="@type='main' and normalize-space()='' and distinct-values(*/local-name())=('line','lb')"/>
+      <xsl:when test="not(*)"/>
+      <!-- Finish linking up marginalia zones with their line -->
+      <xsl:when test="@type=('marginalia_left', 'marginalia_right')">
+        <xsl:copy>
+          <xsl:attribute name="target" select="descendant::*[@target][1]/@target"/>
+          <xsl:apply-templates select="@* except @target | node()"/>
+        </xsl:copy>
+      </xsl:when>
+      <!-- don't allow columnd to be mixed with main. -->
+      <xsl:when test="@type='column' and parent::tei:surface[descendant::tei:zone[@type='main']]"/>         
+      <xsl:when test="@type='main' and parent::tei:surface[descendant::tei:zone[@type='column']]">
+        <xsl:copy>
+          <xsl:apply-templates select="@*|node()"/>
+          <xsl:sequence select="parent::tei:surface/descendant::tei:zone[@type='column']/node()"/>
+        </xsl:copy>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   
   <!-- cleanup ids -->
   <xsl:template match="@xml:id">
     <xsl:if test="not(preceding::*[@xml:id=current()])">
       <xsl:copy-of select="."/>
     </xsl:if>
-  </xsl:template>
+  </xsl:template> 
   
-  <!--<xsl:template match="tei:zone[@type='column']">
-    <xsl:copy>
-      <xsl:choose>
-        <xsl:when test="not(preceding-sibling::tei:zone[@type='column']) and ancestor::tei:surface//tei:zone[@type='marginalia_left']">
-          <xsl:attribute name="type" select="'column_left'"/>
-        </xsl:when>
-        <xsl:when test="not(following-sibling::tei:zone[@type='column']) and ancestor::tei:surface//tei:zone[@type='marginalia_right']">
-          <xsl:attribute name="type" select="'column_right'"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="@type"/>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:apply-templates select="@* except @type | node()"/>
-    </xsl:copy>
-  </xsl:template>-->
-  
-  <!-- Finish linking up marginalia zones with their line -->
-  <xsl:template match="tei:zone[@type=('marginalia_left', 'marginalia_right')]">
-    <xsl:copy>
-      <xsl:attribute name="target" select="descendant::*[@target][1]/@target"/>
-      <xsl:apply-templates select="@* except @target | node()"/>
-    </xsl:copy>
-  </xsl:template>   
-  
-  
-  <!-- Avoid lines only containing marginalia -->
-  <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]"/>
-  <xsl:template match="tei:line[tei:add[@source]][normalize-space()=''][count(*)=1]"/>
-  <xsl:template match="tei:line[not(descendant::tei:anchor[@type='marginalia'])][following-sibling::tei:line[1][descendant::tei:anchor[@type='marginalia']][normalize-space()=''][count(*)=1]]">
-    <xsl:copy>
-      <xsl:attribute name="xml:id" select="following-sibling::tei:line[1]/descendant::tei:anchor[@type='marginalia']/@xml:id"/>
-      <xsl:apply-templates select="@* except @xml:id | node()"/>
-    </xsl:copy>
-  </xsl:template>
-  
-  <xsl:template match="tei:line[descendant::tei:anchor[@type='marginalia']][not(normalize-space()='') or not(count(*)=1)]">
-    <xsl:copy>
-      <xsl:attribute name="xml:id" select="descendant::tei:anchor[@type='marginalia']/@xml:id"/>
-      <xsl:apply-templates select="@* except @xml:id | node()"/>
-    </xsl:copy>
-  </xsl:template>
   
   <!-- remove unnecessary milestones -->
   <xsl:template match="tei:anchor[@type='marginalia']"/>
