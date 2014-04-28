@@ -7,11 +7,12 @@
     version="2.0">
     
     <!-- Replace \n with <lb/> when appropriate -->
+    <!-- Also clear comments -->
     
     <!-- Identity transform -->
     <xsl:template match='@*|node()'>
         <xsl:copy>
-            <xsl:apply-templates select='@*|node()'/>
+            <xsl:apply-templates select='@*|node() except comment()'/>
         </xsl:copy>
     </xsl:template> 
     
