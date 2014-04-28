@@ -128,7 +128,7 @@
     </xsl:template>
     
     <!-- Make spans into metamarks -->
-    <xsl:template match="tei:span">
+    <xsl:template match="tei:span[@to]">
         <add hand="{@hand}" xmlns="http://www.tei-c.org/ns/1.0">
             <metamark xmlns="http://www.tei-c.org/ns/1.0" function="marginalia" spanTo="{@to}" wwa:was="tei:span">
                 <xsl:apply-templates select="@* except @hand except @from except @to|node()"/>
@@ -147,6 +147,9 @@
                 </add>
             </xsl:when>
             <xsl:when test="not(@type='authorial')"/>
+            <xsl:when test="not(@place)">
+                <xsl:apply-templates select="node()"/>
+            </xsl:when>
             <xsl:otherwise>
                 <anchor xmlns="http://www.tei-c.org/ns/1.0" type="marginalia" xml:id="{generate-id()}"/>
             </xsl:otherwise>
@@ -316,8 +319,9 @@
                     <xsl:attribute name="wwa:was"><xsl:text>tei:cb</xsl:text></xsl:attribute>
                     <xsl:attribute name="type"><xsl:text>column</xsl:text></xsl:attribute>
                     <!-- preserve latest handshift -->
+                    <xsl:apply-templates select="@*"/>
                     <xsl:sequence select="preceding::tei:handShift[1]"/>
-                    <xsl:apply-templates select="@*|node()"/>
+                    <xsl:apply-templates select="node()"/>
                 </xsl:copy>
             </xsl:for-each>            
         <!--</zone>-->        
@@ -325,7 +329,7 @@
     <!-- Ignore the following columns -->
     <xsl:template match="tei:zone[descendant::tei:cb][preceding-sibling::tei:zone[descendant::tei:cb]]"/>
     
-    <xsl:template match="tei:zone[descendant::tei:fw][not(@type='pasteon')]">
+    <xsl:template match="tei:zone[descendant::tei:fw][not(@type='pasteon')][not(descendant::tei:cb)]">
         <xsl:apply-templates/>
         <!--<xsl:copy>
             <xsl:choose>
