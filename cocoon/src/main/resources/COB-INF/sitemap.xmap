@@ -64,8 +64,14 @@
         <map:serialize type="xml"/>
       </map:match>
       
+      <map:match pattern="prepare/*">
+        <map:generate src="cocoon:/lbs/{1}"/>
+        <map:transform src="xslt/prepare.xsl" type="saxon"/>
+        <map:serialize type="xml"/>
+      </map:match>
+      
       <map:match pattern="pasteons/*">
-        <map:generate src="cocoon:/lbs/{1}.xml"/>
+        <map:generate src="cocoon:/prepare/{1}.xml"/>
         <map:transform src="xslt/milestoneWrapper.xsl" type="saxon">
           <map:parameter name="milestone" value="pb"/>
           <map:parameter name="wrapper" value="surface"/>
@@ -107,14 +113,14 @@
         <map:serialize type="xml"/>
       </map:match>
       
-      <map:match pattern="orfans/*">
+      <map:match pattern="orphans/*">
         <map:generate src="cocoon:/convert/{1}"/>
-        <map:transform src="xslt/wrapOrfans.xsl" type="saxon"/>
+        <map:transform src="xslt/wrapOrphans.xsl" type="saxon"/>
         <map:serialize type="xml"/>
       </map:match>
       
       <map:match pattern="computeGrid/*">
-        <map:generate src="cocoon:/orfans/{1}"/>
+        <map:generate src="cocoon:/orphans/{1}"/>
         <map:transform src="xslt/computeGrid.xsl" type="saxon"/>
         <map:serialize type="xml"/>
       </map:match>
