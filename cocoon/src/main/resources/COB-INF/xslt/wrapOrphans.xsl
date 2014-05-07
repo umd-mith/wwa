@@ -16,7 +16,7 @@
   
   <xsl:template match="tei:zone[@type='main'][normalize-space()=''][distinct-values(*/local-name())=('line','lb')]"/>
   
-  <xsl:template match="tei:zone[last()][not(@type='main')]">
+  <xsl:template match="tei:zone[not(ancestor::tei:zone)][not(following-sibling::tei:zone)][not(@type=('main', 'main_part'))]">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
@@ -26,6 +26,14 @@
       </zone>
     </xsl:if>
   </xsl:template>
+  
+  <!-- Give columns a column value of there's a main zone or main_part zones -->
+  <!--<xsl:template match="tei:zone[@type='column'][//tei:zone[@type='main']]">
+    <xsl:copy>
+      <xsl:attribute name="rend"> col</xsl:attribute>
+      <xsl:apply-templates select="@* except @rend | node()"/>
+    </xsl:copy>
+  </xsl:template>-->
   
   <xsl:template match="tei:surface/node()[not(self::tei:zone)]"/>  
   
