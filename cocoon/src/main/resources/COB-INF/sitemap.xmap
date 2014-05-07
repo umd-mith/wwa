@@ -90,8 +90,14 @@
         <map:serialize type="xml"/>
       </map:match>
       
-      <map:match pattern="groupPasteons/*">
+      <map:match pattern="groupAnnos/*">
         <map:generate src="cocoon:/surfaces/{1}"/>
+        <map:transform src="xslt/groupAnnos.xsl" type="saxon"/>
+        <map:serialize type="xml"/>
+      </map:match>
+      
+      <map:match pattern="groupPasteons/*">
+        <map:generate src="cocoon:/groupAnnos/{1}"/>
         <map:transform src="xslt/groupPasteons.xsl" type="saxon"/>
         <map:serialize type="xml"/>
       </map:match>
