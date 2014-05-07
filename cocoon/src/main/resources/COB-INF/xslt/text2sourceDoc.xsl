@@ -148,11 +148,11 @@
                         <xsl:apply-templates select="@* except @resp|node()"/>
                     </xsl:copy>            
                 </add>
-            </xsl:when>
-            <xsl:when test="not(@type='authorial')"/>
-            <xsl:when test="not(@place)">
+            </xsl:when>            
+            <xsl:when test="not(@place) or @type='authorial_footnote'">
                 <xsl:apply-templates select="node()"/>
             </xsl:when>
+            <xsl:when test="not(@type='authorial')"/>
             <xsl:otherwise>
                 <anchor xmlns="http://www.tei-c.org/ns/1.0" type="marginalia" xml:id="{generate-id()}"/>
             </xsl:otherwise>
@@ -203,19 +203,31 @@
             
             <!-- Top-level annotations -->
             
-            <xsl:choose>
+            <xsl:choose>                
                 <xsl:when test="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top'][tokenize(@place, ' ')=('left', 'right')]">
                     <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top'][tokenize(@place, ' ')='left']">
                         <zone type="top_marginalia_left" xmlns="http://www.tei-c.org/ns/1.0" >
                             <xsl:call-template name="noteToAdd"/> 
                         </zone>
                     </xsl:for-each>            
-                    
+                    <!-- stick @place top only in the middle -->
+                    <xsl:for-each select="descendant::tei:note[@type='authorial'][@place='top']">
+                        <zone type="top_marginalia_middle" xmlns="http://www.tei-c.org/ns/1.0" >
+                            <xsl:call-template name="noteToAdd"/> 
+                        </zone>
+                    </xsl:for-each>
                     <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='top'][tokenize(@place, ' ')='right']">
                         <zone type="top_marginalia_right" xmlns="http://www.tei-c.org/ns/1.0" >
                             <xsl:call-template name="noteToAdd"/>   
                         </zone>
                     </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="descendant::tei:note[@type='authorial'][@place='top']">
+                    <xsl:for-each select="descendant::tei:note[@type='authorial'][@place='top']">
+                        <zone type="top_marginalia" xmlns="http://www.tei-c.org/ns/1.0" >
+                            <xsl:call-template name="noteToAdd"/> 
+                        </zone>
+                    </xsl:for-each> 
                 </xsl:when>
                 <!-- Only accounting for two columns at the moment... -->
                 <xsl:otherwise>
@@ -247,14 +259,14 @@
             
             
             <!-- left margin annos -->
-            <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='left']">
+            <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='left'][not(tokenize(@place, ' ')=('top','bottom'))]">
                 <zone type="marginalia_left" xmlns="http://www.tei-c.org/ns/1.0" >
                     <xsl:call-template name="noteToAdd"/>    
                 </zone>
             </xsl:for-each>
             
             <!-- right margin annos -->
-            <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='right']">
+            <xsl:for-each select="descendant::tei:note[@type='authorial'][tokenize(@place, ' ')='right'][not(tokenize(@place, ' ')=('top','bottom'))]">
                 <zone type="marginalia_right" xmlns="http://www.tei-c.org/ns/1.0" >
                     <xsl:call-template name="noteToAdd"/>         
                 </zone>
@@ -312,44 +324,136 @@
         </xsl:copy>        
     </xsl:template>    
     
-    <!-- COLUMNS -->
-        
-    <!-- match the first column, replace it with a wrapper and pull in the following siblings -->
-    <xsl:template match="tei:zone[descendant::tei:cb][1]">
-        <!--<zone type="main" xmlns="http://www.tei-c.org/ns/1.0">-->
-            <xsl:for-each select="self::* | following-sibling::tei:zone[descendant::tei:cb]">
-                <xsl:copy>
-                    <xsl:attribute name="wwa:was"><xsl:text>tei:cb</xsl:text></xsl:attribute>
-                    <xsl:attribute name="type"><xsl:text>column</xsl:text></xsl:attribute>
-                    <!-- preserve latest handshift -->
-                    <xsl:apply-templates select="@*"/>
-                    <xsl:sequence select="preceding::tei:handShift[1]"/>
-                    <xsl:apply-templates select="node()"/>
-                </xsl:copy>
-            </xsl:for-each>            
-        <!--</zone>-->        
-    </xsl:template>
-    <!-- Ignore the following columns -->
-    <xsl:template match="tei:zone[descendant::tei:cb][preceding-sibling::tei:zone[descendant::tei:cb]]"/>
+    <!-- ZONES -->
     
-    <xsl:template match="tei:zone[descendant::tei:fw][not(@type='pasteon')][not(descendant::tei:cb)]">
-        <xsl:apply-templates/>
-        <!--<xsl:copy>
-            <xsl:choose>
-                <xsl:when test="descendant::tei:fw[contains(@place,'top')]">
-                    <xsl:attribute name="type"><xsl:text>running_head</xsl:text></xsl:attribute>
-                </xsl:when>
-            </xsl:choose>            
-            <line xmlns="http://www.tei-c.org/ns/1.0"><xsl:apply-templates select="@*|node()"/></line>
-        </xsl:copy>-->        
+    <!-- match the first column, replace it with a wrapper and pull in the following siblings -->
+    <xsl:template match="tei:zone[descendant::tei:cb][following-sibling::tei:zone[descendant::tei:cb]]
+                                                     [not(preceding-sibling::tei:zone[descendant::tei:cb])]">
+        <xsl:for-each select="self::* | following-sibling::tei:zone[descendant::tei:cb]">
+            <xsl:copy>
+                <xsl:attribute name="wwa:was"><xsl:text>tei:cb</xsl:text></xsl:attribute>
+                <xsl:attribute name="type">
+                    <xsl:choose>
+                        <xsl:when test="descendant::tei:cb/@type='end'">
+                            <xsl:text>main_part</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text>column</xsl:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+                <xsl:variable name="totcols" select="count(ancestor::tei:surface//tei:zone[descendant::tei:cb[not(@type='end')]])"/>
+                <xsl:attribute name="rend">
+                    <xsl:choose>
+                        <xsl:when test="descendant::tei:cb/@type='end'">
+                            <xsl:text> col-12</xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:text> col-</xsl:text><xsl:value-of select="12 div $totcols"/> 
+                            
+                            <xsl:if test="preceding-sibling::tei:zone[descendant::tei:cb]">
+                                <xsl:text> new</xsl:text>
+                            </xsl:if>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                
+                </xsl:attribute>
+                <!-- preserve latest handshift -->
+                <xsl:apply-templates select="@* except @type except @rend"/>
+                <xsl:sequence select="preceding::tei:handShift[1]"/>
+                <xsl:choose>
+                    <xsl:when test="descendant::tei:cb/@type='end'">
+                        <xsl:apply-templates select="node() except tei:zone[@type='pasteon']"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:otherwise>
+                </xsl:choose>                
+            </xsl:copy>
+        </xsl:for-each>
     </xsl:template>
-<!--    <xsl:template match="tei:lb[ancestor::tei:zone[descendant::tei:fw]]"/>-->
+    
+    <xsl:template match="tei:zone[descendant::tei:cb][preceding-sibling::tei:zone[descendant::tei:cb]]" />        
+    
+    
+    <xsl:template match="tei:zone[not(descendant::tei:cb)]">
+        <xsl:choose>
+            <xsl:when test="descendant::tei:fw and not(@type='pasteon') and ancestor::tei:surface//tei:zone[descendant::tei:cb]">
+                <xsl:apply-templates select="node()"/>
+            </xsl:when>
+            <!-- main + columns -->
+            <xsl:when test="not(@type='pasteon') and ancestor::tei:surface//tei:zone[descendant::tei:cb]">
+                <xsl:copy>
+                    <xsl:attribute name="type">main</xsl:attribute>
+                    <xsl:attribute name="rend"> col-12b</xsl:attribute>
+                    <xsl:apply-templates select="@* except @type except @rend|node()"/>
+                </xsl:copy>
+            </xsl:when>
+            <!-- book format in one column (only if there are no columns!) -->
+            <xsl:when test="descendant::tei:fw and not(@type='pasteon') and not(ancestor::tei:surface//tei:zone[descendant::tei:cb])">
+                <xsl:apply-templates select="tei:fw"/>
+                <xsl:copy>
+                    <xsl:attribute name="type">main</xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="ancestor::tei:surface//tei:zone[@type='pasteon'][contains(@rend, 'col-')]">
+                            <xsl:attribute name="rend">
+                                <xsl:value-of select="@rend"/>
+                                <xsl:text> col-12</xsl:text>
+                            </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="@rend"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:apply-templates select="@* except @rend" />
+                    <!-- preserve latest handshift -->
+                    <xsl:sequence select="preceding::tei:handShift[1]"/>
+                    <xsl:apply-templates select="node() except tei:zone[@type='pasteon'] except tei:fw"/>
+                </xsl:copy>
+                <!-- Keep pasteons in separate zones -->
+                <xsl:apply-templates select="tei:zone[@type='pasteon']"/>
+            </xsl:when>
+            <!-- when there are no columns, make the only zone a "main" zone -->
+            <xsl:when test="not(descendant::tei:fw) and not(@type='pasteon')">
+                <xsl:copy>
+                    <xsl:attribute name="type">main</xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="ancestor::tei:surface//tei:zone[@type='pasteon'][contains(@rend, 'col-')]">
+                            <xsl:attribute name="rend">
+                                <xsl:value-of select="@rend"/>
+                                <xsl:text> col-12</xsl:text>
+                            </xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="@rend"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                    <xsl:apply-templates select="@* except @rend" />
+                    <!-- preserve latest handshift -->
+                    <xsl:sequence select="preceding::tei:handShift[1]"/>
+                    <xsl:apply-templates select="node() except tei:zone[@type='pasteon']"/>
+                </xsl:copy>
+                <!-- Keep pasteons in separate zones -->
+                <xsl:apply-templates select="tei:zone[@type='pasteon']"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy>
+                    <xsl:apply-templates select="@*|node()"/>
+                </xsl:copy>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+        
+
     
     <!-- Deal with nested pasteons (FLAT ONLY) -->
-    <xsl:template match="tei:add[@rend='pasteon'][ancestor::tei:zone[@type='pasteon']]">
+    <xsl:template match="tei:add[@rend='pasteon'][ancestor::tei:zone[@type=('pasteon', 'end')]]">
         <xsl:apply-templates select="node()"/>
     </xsl:template>
-    <xsl:template match="tei:floatingText[ancestor::tei:zone[@type='pasteon']]">
+    <xsl:template match="tei:floatingText[ancestor::tei:zone[@type=('pasteon', 'end')]]">
+        <xsl:apply-templates select="node()"/>
+    </xsl:template>
+    <xsl:template match="tei:surface[ancestor::tei:floatingText][ancestor::tei:zone[@type=('pasteon', 'end')]]">
         <xsl:apply-templates select="node()"/>
     </xsl:template>
     
@@ -360,36 +464,12 @@
         </zone>
     </xsl:template>
     
-    <!--<xsl:template match="tei:fw[contains(@place,'bottom')]">
-        <zone type="running_head_bottom" xmlns="http://www.tei-c.org/ns/1.0">
+    <xsl:template match="tei:fw[contains(@place,'bottom')]">
+        <zone type="running_bottom" xmlns="http://www.tei-c.org/ns/1.0">
             <xsl:apply-templates select="node()"/>
         </zone>
-    </xsl:template>-->
-    
-    <!-- when there are no columns, make the only zone a "main" zone -->
-    <xsl:template match="tei:zone[not(descendant::tei:cb)][not(descendant::tei:fw)][not(@type='pasteon')]">
-        <xsl:copy>
-            <xsl:attribute name="type">main</xsl:attribute>
-            <xsl:choose>
-                <xsl:when test="ancestor::tei:surface//tei:zone[@type='pasteon'][contains(@rend, 'col-')]">
-                    <xsl:attribute name="rend">
-                        <xsl:value-of select="@rend"/>
-                        <xsl:text> col-12</xsl:text>
-                    </xsl:attribute>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:apply-templates select="@rend"/>
-                </xsl:otherwise>
-            </xsl:choose>
-            <xsl:apply-templates select="@* except @rend" />
-            <!-- preserve latest handshift -->
-            <xsl:sequence select="preceding::tei:handShift[1]"/>
-            <xsl:apply-templates select="node() except tei:zone[@type='pasteon']"/>
-        </xsl:copy>
-        <!-- Keep pasteons in separate zones -->
-        <xsl:apply-templates select="tei:zone[@type='pasteon']"/>
     </xsl:template>
-    
+        
     <xsl:template match="tei:surface[normalize-space()=''][count(*)=1][tei:lb]"/>
     
     <xsl:template match="tei:lb[not(ancestor::tei:zone)]"/>
