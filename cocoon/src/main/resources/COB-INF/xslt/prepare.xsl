@@ -15,10 +15,64 @@
         </xsl:copy>
     </xsl:template> 
     
-    <xsl:template match="tei:div1[@type=('pasteon', 'section')]">
+    <xsl:template match="tei:div1[not(@type=('verso'))]">
         <xsl:apply-templates select="node()"/>
     </xsl:template>
     
     <xsl:template match="tei:gap | tei:space | tei:div2[@type='base']"/>
+    
+    <!-- Make front matters into normal text -->
+    
+    <xsl:template match="tei:front"/>
+    
+    <xsl:template match="tei:body[preceding-sibling::tei:front]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:apply-templates select="preceding-sibling::tei:front/node()"/>
+            <xsl:apply-templates select="node()"/>
+        </xsl:copy>
+        
+    </xsl:template>
+        
+    <xsl:template match="tei:titlePage 
+                       | tei:docTitle 
+                       | tei:titlePart 
+                       | tei:byline 
+                       | tei:epigraph 
+                       | tei:cit
+                       | tei:quote
+                       | tei:bibl
+                       | tei:docImprint
+                       | tei:pubPlace
+                       | tei:docDate
+                       | tei:opener
+                       | tei:floatingText[@type='letter']
+                       | tei:body[parent::tei:floatingText[@type='letter']]">
+       <xsl:apply-templates select="node()"/>
+    </xsl:template>    
+    
+    <xsl:template match="tei:note[@type='footnote']
+                       | tei:note[@place='inline']
+                       | tei:note[@place='interlinear']
+                       | tei:note[@place='infralinear']">
+        <xsl:apply-templates select="node()"/>
+    </xsl:template>
+    
+    <!-- Flatten pasteons followed by columns -->
+    <xsl:template match="tei:add[@rend='pasteon'][following::tei:cb]">
+        <!-- make sure the cb and . share the same following pb or no pb at all -->
+        <xsl:variable name="myPb" select="generate-id(following::tei:pb[1])"/>
+        <xsl:variable name="cbPb" select="generate-id(following::tei:cb[1]//following::tei:pb[1])"/>
+        <xsl:choose>
+            <xsl:when test="not(following::tei:pb) or $myPb = $cbPb">
+                <xsl:apply-templates select="descendant::tei:body/*"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy>
+                    <xsl:apply-templates select="@*|node()"/>
+                </xsl:copy>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
     
 </xsl:stylesheet>
