@@ -22,11 +22,21 @@
       <xsl:when test="tei:anchor[@type='marginalia'] and normalize-space()='' and count(*)=1"/>
       <xsl:when test="tei:add[@source] and normalize-space()='' and count(*)=1"/>
       <xsl:when test="tei:graphic">
-        <xsl:apply-templates select="tei:graphic"/>
+        <xsl:sequence select="tei:graphic"/>
+      </xsl:when>
+      <xsl:when test="tei:zone[@type='running_bottom']">
+        <xsl:apply-templates select="node()"/>
       </xsl:when>
       <xsl:when test="(normalize-space()='' and count(*)=2 and tei:lb and tei:milestone)
         or (normalize-space()='' and count(*)=1 and tei:milestone)">
         <xsl:apply-templates select="tei:milestone"/>
+      </xsl:when>
+      <!-- when there is more than one annotation in this line, only get the first -->
+      <xsl:when test="count(tei:anchor[@type='marginalia']) > 1">
+        <xsl:copy>
+          <xsl:attribute name="xml:id" select="tei:anchor[@type='marginalia'][1]/@xml:id"/>
+          <xsl:apply-templates select="@* except @xml:id | node()"/>
+        </xsl:copy>
       </xsl:when>
       <xsl:when test="following-sibling::tei:line[1][normalize-space()=''][count(*)=1][
         tei:line[normalize-space()=''][count(*)=1][tei:anchor[@type='marginalia']]
@@ -92,26 +102,36 @@
   <xsl:template match="tei:zone">
     <xsl:choose>
       <xsl:when test="@type='main' and normalize-space()='' and distinct-values(*/local-name())=('line','lb')"/>
+      <!--<xsl:when test="@type='running_bottom'">
+        <xsl:copy>
+          <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+      </xsl:when>-->
       <xsl:when test="not(*)"/>
       <!-- Finish linking up marginalia zones with their line -->
       <xsl:when test="@type=('marginalia_left', 'marginalia_right')">
         <xsl:copy>
-          <xsl:attribute name="target" select="descendant::*[@target][1]/@target"/>
+          <xsl:attribute name="target">
+            <xsl:variable name="tar" select="descendant::*[@target][1]/@target"/>
+            <xsl:choose>
+              <!-- if the target points to a line with multiple anchors, change the target to the first anchor -->
+              <xsl:when test="//tei:anchor[@type='marginalia'][@xml:id=substring-after($tar, '#')][parent::tei:line[count(tei:anchor[@type='marginalia']) > 1]]">
+                <xsl:text>#</xsl:text>
+                <xsl:value-of select="//tei:anchor[@type='marginalia'][@xml:id=substring-after($tar, '#')]/parent::tei:line/tei:anchor[@type='marginalia'][1]/@xml:id"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="descendant::*[@target][1]/@target"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
           <xsl:apply-templates select="@* except @target | node()"/>
-        </xsl:copy>
-      </xsl:when>
-      <!-- don't allow columnd to be mixed with main. -->
-      <xsl:when test="@type='column' and parent::tei:surface[descendant::tei:zone[@type='main']]"/>         
-      <xsl:when test="@type='main' and parent::tei:surface[descendant::tei:zone[@type='column']]">
-        <xsl:copy>
-          <xsl:apply-templates select="@*|node()"/>
-          <xsl:sequence select="parent::tei:surface/descendant::tei:zone[@type='column']/node()"/>
         </xsl:copy>
       </xsl:when>
       <xsl:otherwise>
         <xsl:copy>
           <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
+        <xsl:sequence select="tei:line/tei:zone[@type='running_bottom']"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
