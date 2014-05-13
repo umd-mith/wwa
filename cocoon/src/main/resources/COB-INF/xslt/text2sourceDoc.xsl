@@ -140,19 +140,70 @@
     <xsl:template match="tei:note[ancestor::tei:text]">
         <xsl:choose>
             <xsl:when test="ancestor::tei:zone[@type='pasteon'] and @place='top'">
-                <xsl:apply-templates select="node()"/>
+                <xsl:choose>
+                    <xsl:when test="@resp">
+                        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+                            <xsl:attribute name="hand" select="@resp"/>
+                            <xsl:apply-templates select="node()"/>
+                        </add>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="@subtype='nested_anno'">
+                <xsl:choose>
+                    <xsl:when test="@resp">
+                        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+                            <xsl:attribute name="hand" select="@resp"/>
+                            <xsl:apply-templates select="node()"/>
+                        </add>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:otherwise>
+                </xsl:choose>                
             </xsl:when>
             <xsl:when test="not(@type='authorial') and not(@place)">
-                <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@* except @resp|node()"/>
-                    </xsl:copy>            
-                </add>
+                <xsl:choose>
+                    <xsl:when test="@resp">
+                        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+                            <xsl:attribute name="hand" select="@resp"/>
+                            <xsl:apply-templates select="@* except @resp|node()"/>
+                        </add>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>            
             <xsl:when test="not(@place) or @type='authorial_footnote'">
-                <xsl:apply-templates select="node()"/>
+                <xsl:choose>
+                    <xsl:when test="@resp">
+                        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+                            <xsl:attribute name="hand" select="@resp"/>
+                            <xsl:apply-templates select="node()"/>
+                        </add>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
-            <xsl:when test="not(@type='authorial')"/>
+            <xsl:when test="not(@type='authorial')">
+                <xsl:choose>
+                    <xsl:when test="@resp">
+                        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+                            <xsl:attribute name="hand" select="@resp"/>
+                            <xsl:apply-templates select="node()"/>
+                        </add>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="node()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
             <xsl:otherwise>
                 <anchor xmlns="http://www.tei-c.org/ns/1.0" type="marginalia" xml:id="{generate-id()}"/>
             </xsl:otherwise>
@@ -174,9 +225,12 @@
     <xsl:template match="tei:pb | tei:cb"/>
     
     <xsl:template name="noteToAdd">
-        <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0" target="#{generate-id()}">
+        <add xmlns="http://www.tei-c.org/ns/1.0" target="#{generate-id()}">
+            <xsl:if test="@resp">
+                <xsl:attribute name="hand" select="@resp"/>
+            </xsl:if>
             <xsl:copy>
-                <xsl:apply-templates select="@* except @resp except @place|node()"/>
+                <xsl:apply-templates select="@* except @place|node()"/>
             </xsl:copy>            
         </add>
     </xsl:template>
@@ -385,7 +439,7 @@
             <xsl:when test="not(@type='pasteon') and ancestor::tei:surface//tei:zone[descendant::tei:cb]">
                 <xsl:copy>
                     <xsl:attribute name="type">main</xsl:attribute>
-                    <xsl:attribute name="rend"> col-12b</xsl:attribute>
+                    <xsl:attribute name="rend"> col-12</xsl:attribute>
                     <xsl:apply-templates select="@* except @type except @rend|node()"/>
                 </xsl:copy>
             </xsl:when>

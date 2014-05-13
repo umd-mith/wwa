@@ -29,6 +29,9 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xsl:apply-templates select="preceding-sibling::tei:front/node()"/>
+            <xsl:if test="preceding-sibling::tei:pb[preceding-sibling::tei:front]">
+                <xsl:apply-templates select="preceding-sibling::tei:pb[preceding-sibling::tei:front]"/>
+            </xsl:if>
             <xsl:apply-templates select="node()"/>
         </xsl:copy>
         
@@ -54,8 +57,20 @@
     <xsl:template match="tei:note[@type='footnote']
                        | tei:note[@place='inline']
                        | tei:note[@place='interlinear']
-                       | tei:note[@place='infralinear']">
-        <xsl:apply-templates select="node()"/>
+                       | tei:note[@place='infralinear']
+                       | tei:note[@type='authorial'][tokenize(@place, ' ')='top'][ancestor::tei:floatingText[ancestor::tei:add[@rend='pasteon']]]
+                       | tei:note[@type='authorial'][@place='left'][ancestor::tei:floatingText[@rend='flippy']]">
+        <xsl:choose>
+            <xsl:when test="@resp">
+                <add hand="{@resp}" xmlns="http://www.tei-c.org/ns/1.0">
+                    <xsl:attribute name="hand" select="@resp"/>
+                    <xsl:apply-templates select="node()"/>
+                </add>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates select="node()"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     
     <!-- Flatten pasteons followed by columns -->
@@ -73,6 +88,29 @@
                 </xsl:copy>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+    
+    <!-- remove hand from del[@rend='hashmark'] so that the text is not attributed to WW -->
+    <xsl:template match="tei:del[@rend='hashmark']">
+        <xsl:copy>
+            <xsl:apply-templates select="@* except @hand|node()"/>
+        </xsl:copy>
+    </xsl:template>
+    
+    <xsl:template match="tei:*[tokenize(@rend, ' ')='smallcaps']">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xsl:for-each select="node()">
+                <xsl:choose>
+                    <xsl:when test="self::text()">
+                        <xsl:value-of select="lower-case(.)"/>                        
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="."/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
+        </xsl:copy>
     </xsl:template>
     
 </xsl:stylesheet>

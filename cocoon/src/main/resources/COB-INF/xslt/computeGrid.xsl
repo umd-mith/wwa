@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:tei="http://www.tei-c.org/ns/1.0"
+    xmlns:wwa="http://www.whitmanarchive.org/namespace"
     exclude-result-prefixes="#all"
     version="2.0">
     
@@ -145,8 +146,10 @@
             
             <xsl:attribute name="rend">
                 <xsl:value-of select="@rend"/>
-                <xsl:text> row-</xsl:text>
-                <xsl:value-of select="$span"/>
+                <xsl:if test="not(contains(@rend, 'row-'))">                    
+                    <xsl:text> row-</xsl:text>
+                    <xsl:value-of select="$span"/>
+                </xsl:if>
             </xsl:attribute>
             
             <xsl:apply-templates select="@* except @rend | node()" mode="grid"/>

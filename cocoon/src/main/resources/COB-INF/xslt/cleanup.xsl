@@ -102,6 +102,12 @@
   <xsl:template match="tei:zone">
     <xsl:choose>
       <xsl:when test="@type='main' and normalize-space()='' and distinct-values(*/local-name())=('line','lb')"/>
+      <xsl:when test="@type='main' and descendant::tei:zone[@type='running_head']">
+        <xsl:sequence select="descendant::tei:zone[@type='running_head']"/>
+        <xsl:copy>
+          <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+      </xsl:when>
       <!--<xsl:when test="@type='running_bottom'">
         <xsl:copy>
           <xsl:apply-templates select="@*|node()"/>

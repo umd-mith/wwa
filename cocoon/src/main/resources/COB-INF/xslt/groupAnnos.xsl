@@ -36,9 +36,20 @@
             <xsl:for-each-group select="tei:note[tokenize(@place, ' ')=('top', 'bottom')]" group-by="@place">
                 <note xmlns="http://www.tei-c.org/ns/1.0" type="authorial" place="{current-grouping-key()}">
                     <xsl:for-each select="current-group()" >
-                        <xsl:copy>
-                            <xsl:apply-templates select="@* except @place|node()" mode="annos" />
-                        </xsl:copy>       
+                        <xsl:choose>
+                            <xsl:when test="self::tei:note">
+                                <xsl:copy>
+                                    <xsl:attribute name="subtype">nested_anno</xsl:attribute>
+                                    <xsl:apply-templates select="@* except @place|node()" mode="annos" />
+                                </xsl:copy>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:copy>
+                                    <xsl:attribute name="subtype">nested_anno</xsl:attribute>
+                                    <xsl:apply-templates select="@* except @place|node()" mode="annos" />
+                                </xsl:copy>
+                            </xsl:otherwise>
+                        </xsl:choose>   
                         <lb/>
                     </xsl:for-each>
                 </note>
