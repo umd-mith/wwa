@@ -87,6 +87,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
       # Set templates
       @metaTemplate = _.template($('#manifestMeta-tpl').html())
+      @citationTemplate = _.template($('#citation-tpl').html())
 
       # Add views for child collections right away
       @canvasesView = new CanvasesView collection: @model.canvasesData
@@ -147,8 +148,12 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
       # Render Manifest Metadata
       noColon = {}
       for k,v of @model.toJSON()
-        noColon[k.replace(':', '')] = v
+        escaped = k.replace('http://www.tei-c.org/ns/1.0/idno', 'teiID')
+        escaped = escaped.replace(':', '')
+        noColon[escaped] = v
       $('#SGAManifestMeta').html @metaTemplate(noColon)
+      noColon["url"] = document.URL
+      $('#detail-view-citation').html @citationTemplate(noColon)
 
     render: ->
       # Manage UI components as subviews      
