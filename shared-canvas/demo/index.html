@@ -33,15 +33,15 @@
                     <div class="accordion-group">
                       <div class="well">
                         <div class="btn-toolbar pull-left" id="view-controls">
-                          <div class="btn-group"><!-- <a class="btn btn-sm" title="Show/Hide Marquee"  id="marquee-sh"><i class="icon-red icon-marquee"></i></a> --></div>
-                          <div class="btn-group" id="img-controls"><a class="btn btn-sm" title="Reset Zoom" id="zoom-reset"><i class="icon-red icon-search"></i></a><a class="btn btn-sm" title="Zoom In" id="zoom-in"><i class="icon-red icon-zoom-in"></i></a><a class="btn btn-sm" title="Zoom Out" id="zoom-out"><i class="icon-red icon-zoom-out"></i></a></div>             
-                          <div class="btn-group" id="mode-controls" data-toggle="buttons"><a class="btn btn-sm" title="View Image Only" id="img-only"><input type="radio" name="options"><i class="icon-red icon-picture"></i></a><a class="btn btn-sm active" title="Standard View" id="mode-std"><input type="radio" name="options"><i class="icon-red icon-pause"></i></a>
-                            <a class="btn btn-sm" title="View Full Text" id="mode-txt"><input type="radio" name="options"><i class="icon-red icon-text-width"></i></a><!-- <a class="btn btn-sm" title="View Reading Text" id="mode-rdg"><input type="radio" name="options"><i class="icon-red icon-align-left"></i></a> <a class="btn btn-sm" title="View TEI" id="mode-xml"><input type="radio" name="options"><i class="icon-red icon-code"></i></a>--></div>
+                          <div class="btn-group btn-group-sm"><!-- <a class="btn" title="Show/Hide Marquee"  id="marquee-sh"><i class="icon-red icon-marquee"></i></a> --></div>
+                          <div class="btn-group btn-group-sm" id="img-controls"><a class="btn" title="Reset Zoom" id="zoom-reset"><i class="icon-red icon-search"></i></a><a class="btn" title="Zoom In" id="zoom-in"><i class="icon-red icon-zoom-in"></i></a><a class="btn" title="Zoom Out" id="zoom-out"><i class="icon-red icon-zoom-out"></i></a></div>             
+                          <div class="btn-group btn-group-sm" id="mode-controls" data-toggle="buttons"><a class="btn" title="View Image Only" id="img-only"><input type="radio" name="options"><i class="icon-red icon-picture"></i></a><a class="btn active" title="Standard View" id="mode-std"><input type="radio" name="options"><i class="icon-red icon-pause"></i></a>
+                            <a class="btn" title="View Full Text" id="mode-txt"><input type="radio" name="options"><i class="icon-red icon-text-width"></i></a><!-- <a class="btn" title="View Reading Text" id="mode-rdg"><input type="radio" name="options"><i class="icon-red icon-align-left"></i></a> <a class="btn" title="View TEI" id="mode-xml"><input type="radio" name="options"><i class="icon-red icon-code"></i></a>--></div>
                         </div>
                         <!-- /view-controls -->
                         
                         <div class="pull-left" id="search-form-block">
-                          <a class="btn btn-default" href="manifests.html">Pick another document</a>
+                          <div class="btn-toolbar pull-left" id="search-form-block">   <div class="btn-group btn-group-sm"><a class="btn" href="manifests.html">Pick another document</a>   </div> </div>
                           <!-- <div class="accordion-heading">
                             <div class="input-group input-group-sm" id="searchbox">                  
                               <div class="input-group input-group-sm" id="searchbox">
@@ -57,7 +57,7 @@
                         <!-- /search-form-block -->
                         
                         <div class="btn-toolbar pull-right" id="sequence-nav">
-                          <div class="btn-group" id="pager-controls"><a class="btn btn-sm" id="first-page"><i class="icon-red icon-step-backward"></i></a><a class="btn btn-sm" id="prev-page"><i class="icon-red icon-chevron-left" ></i></a><a class="btn btn-sm" id="next-page"><i class="icon-red icon-chevron-right"></i></a><a class="btn btn-sm" id="last-page"><i class="icon-red icon-step-forward"></i></a></div>
+                          <div class="btn-group btn-group-sm" id="pager-controls"><a class="btn" id="first-page"><i class="icon-red icon-step-backward"></i></a><a class="btn" id="prev-page"><i class="icon-red icon-chevron-left" ></i></a><a class="btn" id="next-page"><i class="icon-red icon-chevron-right"></i></a><a class="btn" id="last-page"><i class="icon-red icon-step-forward"></i></a></div>
                         </div>
                         <!-- /sequence-nav --> 
                
@@ -135,14 +135,7 @@
             <div class="detail-view-meta">
               <div class="row">
                 <div id="detail-view-citation" class="meta-data-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <div class="well well-sm meta-data-item">
-                    <h3 class="meta-title">Citation</h3>
-                    <h4 class="cite-page"><i class="icon-desktop icon-fixed-width"></i> Cite This Page</h4>
-                    <div class="page-citation">
-                      <span id="cite-author"></span> (<span id="cite-year"></span>). "<span id="cite-title"></span>", in <em>The Shelley-Godwin Archive</em>, <span id="cite-page"></span>. 
-                      Retrieved from <span id="cite-url"></span>
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -168,47 +161,47 @@
       <li class="meta-data-item">
         <label class="meta-label" id="meta-workAuthor">Author(s)&nbsp;</label><span><%=scagentLabel%></span></li>      
       <li class="meta-data-item">
-        <label class="meta-label" id="meta-workDate">Date Written&nbsp;</label><span><%=scdateLabel%></span></li>
+        <label class="meta-label" id="meta-workDate">Date(s)&nbsp;</label><span><%=scdateLabel%></span></li>
       <li class="meta-data-item">
-        <label class="meta-label" id="meta-workTitle">Title/Literary Work&nbsp;</label><span><%=dctitle%></span></li>   
+        <label class="meta-label" id="meta-workTitle">Title&nbsp;</label><span><%=dctitle%></span></li>   
     </ul>
+
     <ul class="meta-data-group controls col-lg-3">
       <li class="meta-data-item">
-        <label class="meta-label" id="meta-workNotebook">View&nbsp;</label><span><%=label%></span></li>
-      <li class="meta-data-item">
-        <label class="meta-label" id="meta-workState">State&nbsp;</label><span><%=sgastateLabel%></span></li>
+        <label class="meta-label" id="meta-bibSources">Bibliographic Source(s)&nbsp;</label><span><%=references%></span>
+      </li>
+    </ul>
+
+    <ul class="meta-data-group controls col-lg-3">
         <li class="meta-data-item">
-        <label class="meta-label" id="meta-workInstitution">Institution&nbsp;</label><span><%=attribution%></span></li>
+        <label class="meta-label" id="meta-workInstitution">Repository&nbsp;</label><span><%=attribution%></span></li>
+    </ul>
+
+    <ul class="meta-data-group controls col-lg-3">
+      <li class="meta-data-item">
+        <label class="meta-label" id="meta-workId">Whitman Archive ID&nbsp;</label><span><%=teiID%></span>
+      </li>
     </ul>
   </script>
 
   <script type="text/template" id="canvasMeta-tpl">
     <ul class="meta-data-group controls col-lg-3">
       <li class="meta-data-item">
-        <label class="meta-label" id="meta-workHands">Hand(s)&nbsp;</label><span><%=sgahandLabel%></span>
-      </li>
-      <li class="meta-data-item">
         <label class="meta-label" id="meta-workShelfmark">Shelfmark&nbsp;</label><span><%=sgashelfmarkLabel%></span>
       </li>
-      <li class="meta-data-item">
-        <label class="meta-label" id="meta-workFolio">Folio&nbsp;</label><span><%=label%></span>
-      </li>
     </ul>
-    <div class="meta-data-group col-lg-3 controls" id="status-block">
-      <div class="well well-sm">
-        <div class="meta-data-item circle-yes" id="status-transcription">
-          <label class="meta-label">Transcription Status</label>
-          <span class="badge-red"><i class="icon-circle <% if (trans=='red') {%>active<%}%>"></i></span>
-          <span class="badge-yellow"><i class="icon-circle <% if (trans=='yellow') {%>active<%}%>"></i></span>
-          <span class="badge-green"><i class="icon-circle <% if (trans=='green') {%>active<%}%>"></i></span></div>
-        <div class="meta-data-item circle-yes" id="status-metadata">
-          <label class="meta-label">Metadata Status</label>
-          <span class="badge-red"><i class="icon-circle <% if (meta=='red') {%>active<%}%>"></i></span>
-          <span class="badge-yellow"><i class="icon-circle <% if (meta=='yellow') {%>active<%}%>"></i></span>
-          <span class="badge-green"><i class="icon-circle <% if (meta=='green') {%>active<%}%>"></i></span></div>
-      </div>             
+  </script>
+
+  <script type="text/template" id="citation-tpl">
+    <div class="well well-sm meta-data-item">
+      <h3 class="meta-title">Citation</h3>
+      <h4 class="cite-page"><i class="icon-desktop icon-fixed-width"></i> Cite This Page</h4>
+      <div class="page-citation">
+        <span id="cite-author"><%=scagentLabel%></span>, <%=dctitle%> (<%=scdateLabel%>), from "Walt Whitman's Annotations," ed. Matt Cohen, <%=editors%> in <em>The Walt Whitman Archive</em>, Ed Folsom and Kenneth M. Price, gen. eds. <%=url%>
+      </div>
     </div>
   </script>
+
   <script src="js/main.js"></script>
   </body>
 </html>
