@@ -27,19 +27,23 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
     nextPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")+1
-      Backbone.history.navigate("#/p"+newPage)
+      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      Backbone.history.navigate hash
     prevPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")-1
-      Backbone.history.navigate("#/p"+newPage)
+      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      Backbone.history.navigate hash
     firstPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMin")
-      Backbone.history.navigate("#/p"+newPage)
+      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      Backbone.history.navigate hash
     lastPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMax")
-      Backbone.history.navigate("#/p"+newPage)
+      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      Backbone.history.navigate hash
 
     initialize: (options) ->
       super    
@@ -81,7 +85,7 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
           canvases = sequence.get "canvases"
           canvasId = canvases[n]
           canvas = @data.canvasesMeta.get canvasId
-          canvas.get "label"
+          canvas.get "sga:folioLabel"
 
         try 
           if @$el.data( "ui-slider" ) # Is the container set?
@@ -102,7 +106,8 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
                 newPage =  pages - ui.value
                 Backbone.history.navigate("#/p"+(newPage+1))
 
-            @$el.find("a").text( getLabel(0) )
+            @listenTo @variables, "change:seqPage", (n) ->
+              @$el.find("a").text( getLabel(n-1) )
         
             # Using the concept of "Event aggregation" (similar to the dispatcher in Angles)
             # cfr.: http://addyosmani.github.io/backbone-fundamentals/#event-aggregator
@@ -131,27 +136,27 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
           console.log e, "Unable to update value of slider"
 
       # Draw search result indicators
-      Backbone.on "viewer:searchResults", (results) =>
-        # Remove existing highlights, if any
-        @$el.find('.res').remove()
+      # Backbone.on "viewer:searchResults", (results) =>
+      #   # Remove existing highlights, if any
+      #   @$el.find('.res').remove()
 
-        # Append highglights
+      #   # Append highglights
 
-        pages = @variables.get "seqMax"
+      #   pages = @variables.get "seqMax"
 
-        try
-          for r in results
-            r = r
-            res_height = @$el.height() / (pages)
-            res_h_perc = (pages) / 100
-            s_min = @$el.slider("option", "min")
-            s_max = @$el.slider("option", "max")
-            valPercent = 100 - (( r - s_min ) / ( s_max - s_min )  * 100)
-            adjustment = 0 #res_h_perc / 2
-            console.log valPercent
-            @$el.append("<div style='bottom:#{valPercent + adjustment}%; height:#{res_height}px' class='res ui-slider-range ui-widget-header ui-corner-all'> </div>")
-        catch e
-          console.log "Unable to update slider with search results"
+      #   try
+      #     for r in results
+      #       r = r
+      #       res_height = @$el.height() / (pages)
+      #       res_h_perc = (pages) / 100
+      #       s_min = @$el.slider("option", "min")
+      #       s_max = @$el.slider("option", "max")
+      #       valPercent = 100 - (( r - s_min ) / ( s_max - s_min )  * 100)
+      #       adjustment = res_h_perc / 2
+      #       # console.log valPercent
+      #       @$el.append("<div style='bottom:#{valPercent + adjustment}%; height:#{res_height}px' class='res ui-slider-range ui-widget-header ui-corner-all'> </div>")
+      #   catch e
+      #     console.log "Unable to update slider with search results"
 
   class SGASharedCanvas.Component.ImageControls extends ComponentView
 
@@ -215,7 +220,7 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
       @colors = options.colors
       @colors = {} if !@colors?
       if !@colors.visible?
-        @colors.visible = '#a54647'
+        @colors.visible = '#131374'
       if !@colors.limited?
         @colors.limited = '#D9D9D9'
       # set a default limiter if specified. 
