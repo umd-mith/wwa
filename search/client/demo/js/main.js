@@ -2,6 +2,7 @@
 
     $('#all-results').hide();
 
+    // var service = "http://spacely.unl.edu/wa_search/search";
     var service = "http://localhost:5000/search";
     var options = $('#refine-results');
     var destination = $('#results-grid ul');

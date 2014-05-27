@@ -91,7 +91,7 @@ def search():
         response = s.raw_query(q=fields[0]+":"+q, 
             q_op='AND',
             # fl='shelfmark,id,work,viewer_url,authors,attribution,shelf_label', 
-            fl='shelfmark,id,viewer_url', 
+            fl='shelfmark,id,work,shelf_label,viewer_url', 
             fq=fqs, 
             wt='json', 
             start=start,

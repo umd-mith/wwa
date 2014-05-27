@@ -2,9 +2,10 @@
 # coding=UTF-8
 """ Index fields from SGA TEI to a Solr instance"""
 
-import os, sys
+import os, sys, re
 import solr
 import xml.sax, json
+from lxml import etree
  
 class Doc :
     def __init__(self, 
@@ -44,11 +45,12 @@ class Doc :
     def commit(self):
         # print "id: %s\nshelf: %s\ntext: %s\nhands: %s\nmod: %s\nhands_pos: %s\nmod_pos: %s\n" % (self.doc_id, self.shelfmark, self.text, self.hands, self.mod, self.hands_pos, self.mod_pos)
         # print "id: %s\nhi: %s\n" % (self.doc_id, self.hands["ww"].decode('utf-8'))
+        # return 0
         self.solr.add(id=self.doc_id, 
             shelfmark=self.shelfmark, 
-            # shelf_label=self.shelf_label,
+            shelf_label=self.shelf_label,
             viewer_url = self.viewer_url,
-            # work=self.work,
+            work=self.work,
             # authors=self.authors,
             # attribution=self.attribution,
             text=self.text, 
@@ -122,19 +124,20 @@ class GSAContentHandler(xml.sax.ContentHandler):
                 # self.doc.shelfmark = partOf[1:] if partOf[0] == "#" else partOf
             self.doc.doc_id = attrs["xml:id"]
 
-            # Find my manifest and populate metadata
-            # for mk in manifests:
-            #     for c in manifests[mk]["canvases"]:                
-            #         if c["sga:hasTeiSource"].endswith(self.filename):
-            #             self.doc.shelf_label = c["label"]
-            #             self.doc.viewer_url = c["service"]
-            #             self.doc.work = manifests[mk]["dc:title"]
-            #             self.doc.authors = manifests[mk]["metadata"][0]["value"]
-            #             self.doc.attribution = manifests[mk]["attribution"]
-            #             self.doc.shelfmark = manifests[mk]["label"]
             parts = self.doc.doc_id.split('-')
-            self.doc.viewer_url = "/demo/?mf=%s#/p%d/" % (parts[0], int(parts[1]))
+            self.doc.viewer_url = "/wwa/?mf=%s#/p%d/" % (parts[0], int(parts[1]))
             self.doc.shelfmark = parts[0]
+
+            source = open(xml_dir + self.doc.shelfmark + '-header.xml')
+            meta = etree.parse(source).getroot()
+            NS = "http://www.tei-c.org/ns/1.0"
+            
+            self.doc.work = meta.find(".//{%s}fileDesc//{%s}titleStmt//{%s}title[@level='m'][@type='main']" % (NS,NS,NS)).text
+            if self.doc.work == None:
+                self.doc.work = "Untitled"
+            self.doc.shelf_label = meta.find(".//{%s}fileDesc//{%s}sourceDesc//{%s}bibl/{%s}idno" % (NS,NS,NS,NS)).text
+            if self.doc.shelf_label == None:
+                self.doc.shelf_label = "Unknown"
 
         if "hand" in attrs:
             if not (name == "hi" and attrs["hand"] == "#ww"):
@@ -277,23 +280,11 @@ if __name__ == "__main__":
     # Connect to solr instance
     s = solr.SolrConnection('http://localhost:8080/solr/wwa')
 
-    # Walk provided directory for manifests; parse them and store them
-    # man_dir = os.path.normpath(sys.argv[2]) + os.sep
-
-    # manifests = {}
-
-    # for d in os.listdir(man_dir):
-    #     if os.path.isdir(man_dir + d):
-    #         for f in os.listdir(man_dir + d):
-    #             if f.endswith('.jsonld'):
-    #                 json_data=open(man_dir + os.sep + d + os.sep + f)
-    #                 data = json.load(json_data)
-    #                 manifests[d] = data
-
     # Walk provided directory for xml files; parse them and create/commit documents
     xml_dir = os.path.normpath(sys.argv[1]) + os.sep
     for f in os.listdir(xml_dir):
-        if f.endswith('.xml'):
+        p = re.compile(r'\w{3}\.\d{5}-\d{4}\.xml')
+        if p.match(f):
             source = open(xml_dir + f)
             xml.sax.parse(source, GSAContentHandler(s, f))
             source.close()

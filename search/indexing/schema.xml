@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<schema name="sga" version="1.5">
+<schema name="wa_search" version="1.5">
   <types>
     <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
     <fieldType name="float" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0"/>
@@ -69,10 +69,10 @@
     <field name="id" type="string" indexed="true" stored="true" required="true" /> 
     <field name="shelfmark" type="string" indexed="true" stored="true" required="true" />
 
-    <!-- <field name="shelf_label" type="string" indexed="true" stored="true" required="true" />
+     <field name="shelf_label" type="string" indexed="true" stored="true" required="true" />
     <field name="viewer_url" type="string" indexed="true" stored="true" required="true" />
     <field name="work" type="string" indexed="true" stored="true" required="true" />
-    <field name="authors" type="string" indexed="true" stored="true" required="true" />
+    <!--<field name="authors" type="string" indexed="true" stored="true" required="true" />
     <field name="attribution" type="string" indexed="true" stored="true" required="true" /> -->
 
     <field name="added" type="text" multiValued="true" indexed="true" stored="true" required="false"/>
