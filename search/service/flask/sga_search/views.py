@@ -26,6 +26,8 @@ def search():
     def do_search(s, f, q, start, fq, sort, pageLength=20):
         """ Send query to solr and prepare slimmed down JSON object for displaying results """
 
+        viewer = "/wwa/?mf="
+
         hl_simple_pre = '<em>'
         hl_simple_post = '</em>'
 
@@ -48,7 +50,7 @@ def search():
         response = s.raw_query(q=fields[0]+":"+q, 
             q_op='AND',
             # fl='shelfmark,id,work,viewer_url,authors,attribution,shelf_label', 
-            fl='shelfmark,id,work,shelf_label,viewer_url', 
+            fl='shelfmark,id,work,shelf_label.viewer_url', 
             fq=fqs, 
             wt='json', 
             start=start,
@@ -91,13 +93,16 @@ def search():
         for res_orig in r["response"]["docs"]:
             res = res_orig.copy()
 
-            viewer_url = 
+            parts = res["id"].split('-')
+            viewer_url = "%s%s#/p%d/" % (viewer, parts[0], int(parts[1]))
+
+            res["viewer_url"] = viewer_url
 
             # metadata
             results["metadata"][res["shelfmark"]] = {
             #     "shelf_label":res["shelf_label"],
             #     "work":res["work"],
-                "viewer_url":res["viewer_url"],
+                "viewer_url":viewer_url,
             #     "authors":res["authors"],
             #     "attribution":res["attribution"]
             }
