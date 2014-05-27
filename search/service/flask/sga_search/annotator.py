@@ -6,7 +6,6 @@ def oa_annotations(hl, TEI_id, source_dir, uid, hl_simple_pre, hl_simple_post, s
   """ This function returns an ao:Annotation for highlighted text """
   
   annos = []
-  source_dir = "/demo/xml/"
   # A field can contain multiple highlights; loop on them and add the resulting
   # annotations to annos.
   for i, m in enumerate(re.finditer(hl_simple_pre+r'(.+?)'+hl_simple_post, hl)):
