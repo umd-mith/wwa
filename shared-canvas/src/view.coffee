@@ -15,11 +15,14 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
     initialize: (config={}) ->     
 
       manifestUrl = config.manifest
+      searchService = config.searchService
       # manifest = SGASharedCanvas.Data.importFullJSONLD manifestUrl 
 
       # Instantiate manifests collection and view
       manifests = SGASharedCanvas.Data.Manifests
-      new ManifestsView collection : manifests
+      new ManifestsView 
+        collection : manifests
+        searchService : searchService
       # Add manifest from DOM. This triggers data collection and rendering.
       manifest = manifests.add
         url: manifestUrl
@@ -31,11 +34,14 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
   # Manifests view
   class ManifestsView extends Backbone.View
 
-    initialize: ->
+    initialize: (options) ->
+      @searchService = options.searchService
       @listenTo @collection, 'add', @addOne
 
     addOne: (model) ->
-      new ManifestView model: model
+      new ManifestView 
+        model: model
+        searchService: @searchService
 
     render: ->
       @
@@ -47,7 +53,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
     # already present in the HTML.
     el: '#SGASharedCanvasViewer'
 
-    initialize: ->
+    initialize: (options) ->
 
       fetchCanvas = (n) =>
         # For now we assume there is only one sequence.
@@ -106,7 +112,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
       # When search results are requested through a Router, fetch the search data.
         if search?          
-          @model.searchResults.fetch @model, search.filters, search.query          
+          @model.searchResults.fetch @model, search.filters, search.query, options.searchService          
 
           @listenToOnce @model.searchResults, 'sync', ->
             searchResultsPositions = []
@@ -314,23 +320,31 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
       container = $("<div></div>")
       @$el.append(container)
-      $(container).height(Math.floor(@$el.width() * 4 / 3))
+
+      gcd = (x, y) ->
+        [x, y] = [y, x%y] until y is 0
+        x
+
+      canvasWidth = @model.get("width")
+      canvasHeight = @model.get("height")
+
+      aspectRatio = gcd canvasWidth, canvasHeight      
+
+      $(container).height(Math.floor(@$el.width() * (canvasWidth / aspectRatio) / (canvasHeight / aspectRatio)))
       $(container).css
         'background-color': 'white'
         'z-index': 0
 
-      canvasWidth = null
-      canvasHeight = null
-
       baseFontSize = 110 # in terms of the image size - about 15pt
       DivHeight = null
       DivWidth = Math.floor(@$el.width()*20/20)
-      @$el.height(Math.floor(@$el.width() * 4 / 3))
+      @$el.height(Math.floor(@$el.width() * (canvasWidth / aspectRatio) / (canvasHeight / aspectRatio)))
 
       # This figures out the scale for our further calculations.
       resizer = =>
+        aspectRatio = gcd canvasWidth, canvasHeight 
         DivWidth = Math.floor(@$el.width()*20/20,10)
-        if canvasWidth? and canvasWidth > 0
+        if canvasWidth? and canvasWidth > 0          
           @variables.set 'scale', DivWidth / canvasWidth
         if canvasHeight? and canvasHeight > 0
           @$el.height(DivHeight = Math.floor(canvasHeight * @variables.get 'scale'))
@@ -856,13 +870,8 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
 
       djatokaTileWidth = 256
 
-      x = if @model.get('x')? then @model.get('x') else 0
-      y = if @model.get('y')? then @model.get('y') else 0
-      width = if @model.get('width')? then @model.get('width') else @variables.get("width") - x
-      height = if @model.get('height')? then @model.get('height') else @variables.get("height") - x
-
-      divWidth = @$el.width() || 1
-      divHeight = @$el.height() || 1
+      width = if @model.get('width')? then @model.get('width')
+      height = if @model.get('height')? then @model.get('height')
 
       divScale = @variables.get("scale")
       imgScale = divScale
@@ -902,6 +911,7 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           # div{Width,Height} are the size of the HTML <div/> in which we are rendering the image
           divWidth = @$el.width() || 1
           divHeight = @$el.height() || 1
+
           #divScale = @variables.get("scale")
           # {x,y}Tiles are how many whole times we can tile the <div/> with tiles _djatokaTileWidth_ wide
           xTiles = Math.floor(originalWidth * divScale * Math.pow(2.0, zoomLevel) / djatokaTileWidth)
@@ -933,9 +943,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           #xUnits * 2^8 = divWidth - divWidth % 2^8
           #xUnits * 2^(8+z) = originalWidth - originalWidth % 2^(8+z)
           recalculateBaseZoomLevel = =>
-            divWidth = @$el.width() || 1
             if @variables.get("scale")? > 0
               baseZoomLevel = Math.max(0, Math.ceil(-Math.log( @variables.get("scale") * imgScale )/Math.log(2)))
+              baseZoomLevel = baseZoomLevel + 1
               @variables.set 'minZoom', baseZoomLevel
               @variables.set 'maxZoom', zoomLevels
 
@@ -1227,6 +1237,9 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           setScale divScale
 
           zoomLevel = 0
+
+          Backbone.on 'viewer:resize', (options) =>
+            setScale options.scale
 
           # Listen to Image Controls zoom value for updating
           @listenTo imageControls.variables, 'change:zoom', (z) ->
