@@ -943,9 +943,10 @@ SGASharedCanvas.View = SGASharedCanvas.View or {}
           #xUnits * 2^8 = divWidth - divWidth % 2^8
           #xUnits * 2^(8+z) = originalWidth - originalWidth % 2^(8+z)
           recalculateBaseZoomLevel = =>
+            console.log @variables.get("scale")
             if @variables.get("scale")? > 0
               baseZoomLevel = Math.max(0, Math.ceil(-Math.log( @variables.get("scale") * imgScale )/Math.log(2)))
-              baseZoomLevel = baseZoomLevel + 1
+              baseZoomLevel = Math.max(0, zoomLevels - baseZoomLevel)
               @variables.set 'minZoom', baseZoomLevel
               @variables.set 'maxZoom', zoomLevels
 
