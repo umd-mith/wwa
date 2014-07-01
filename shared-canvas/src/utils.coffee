@@ -17,11 +17,12 @@ SGASharedCanvas.Utils = SGASharedCanvas.Utils or {}
     constructor: (@variables) ->
       _.extend @, Backbone.Events
 
-    set: (prop, val) ->
+    set: (prop, val, silent=false) ->
       @variables[prop] = val
-      @trigger 'change', @variables
-      @trigger 'all', @variables
-      @trigger 'change:'+prop, val, @variables
+      if !silent
+        @trigger 'change', @variables
+        @trigger 'all', @variables
+        @trigger 'change:'+prop, val, @variables
 
     get: (prop) ->  
       @variables[prop]
