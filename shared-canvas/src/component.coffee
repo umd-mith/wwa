@@ -27,22 +27,30 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
     nextPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")+1
-      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      hash = "#/p"+newPage
+      if Backbone.history.location.hash.indexOf("#/p") > -1
+        hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
       Backbone.history.navigate hash
     prevPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqPage")-1
-      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      hash = "#/p"+newPage
+      if Backbone.history.location.hash.indexOf("#/p") > -1
+        hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
       Backbone.history.navigate hash
     firstPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMin")
-      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      hash = "#/p"+newPage
+      if Backbone.history.location.hash.indexOf("#/p") > -1
+        hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
       Backbone.history.navigate hash
     lastPage: (e) ->
       e.preventDefault()
       newPage = @variables.get("seqMax")
-      hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
+      hash = "#/p"+newPage
+      if Backbone.history.location.hash.indexOf("#/p") > -1
+        hash = Backbone.history.location.hash.replace(/#\/p\d+/, '#/p'+newPage)
       Backbone.history.navigate hash
 
     initialize: (options) ->
@@ -167,22 +175,23 @@ SGASharedCanvas.Component = SGASharedCanvas.Component or {}
 
     zoomReset: (e) ->
       e.preventDefault()
-      @variables.set "zoom", @variables.get("minZoom")
+      @variables.set "zoom", 0
 
     zoomIn: (e) ->
       e.preventDefault()
       zoom = @variables.get "zoom"
-      if Math.floor zoom+1 <= @variables.get "maxZoom"
+      range = @variables.get("maxZoom") - @variables.get("minZoom")
+      if Math.floor zoom+1 <= range
         @variables.set "zoom", Math.floor zoom+1
 
-    zoomOut: (e) ->
+    zoomOut: (e) ->      
       e.preventDefault()
       zoom = @variables.get "zoom"
-      minZoom = @variables.get "minZoom"
-      if Math.floor zoom-1 > minZoom
+      range = @variables.get("maxZoom") - @variables.get("minZoom")
+      if Math.floor zoom-1 > 0
         @variables.set "zoom", Math.floor zoom-1
-      else if Math.floor zoom-1 == Math.floor minZoom
-        @variables.set "zoom", minZoom
+      else 
+        @variables.set "zoom", 0
 
   class SGASharedCanvas.Component.ReadingModeControls extends ComponentView
 
