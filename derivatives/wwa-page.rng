@@ -3,7 +3,7 @@
          xmlns:xlink="http://www.w3.org/1999/xlink"
          datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
          ns="http://www.tei-c.org/ns/1.0"><!--
-Schema generated from ODD source 2014-01-14T17:54:04Z. 
+Schema generated from ODD source 2014-01-14T19:58:08Z. 
 Edition: 2.5.0. Last updated on
 	26th July 2013.
 Edition Location: http://www.tei-c.org/Vault/P5/2.5.0/
@@ -1903,6 +1903,44 @@ The element indicated by @spanTo (<sch:value-of select="@spanTo"/>) must follow 
          </attribute>
       </optional>
    </define>
+   <define name="wwa-patt.milestoneUnit.attributes">
+      <ref name="wwa-patt.milestoneUnit.attribute.unit"/>
+   </define>
+   <define name="wwa-patt.milestoneUnit.attribute.unit">
+      <attribute name="unit">
+         <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">provides a conventional name for the kind of section changing at this milestone.
+Suggested values include: 1] page; 2] column; 3] line; 4] book; 5] poem; 6] canto; 7] speaker; 8] stanza; 9] act; 10] scene; 11] section; 12] absent; 13] unnumbered</a:documentation>
+         <choice>
+            <value>page</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">physical page breaks (synonymous with the pb element).</a:documentation>
+            <value>column</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">column breaks.</a:documentation>
+            <value>line</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">line breaks (synonymous with the lb element).</a:documentation>
+            <value>book</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">any units termed book, liber, etc.</a:documentation>
+            <value>poem</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">individual poems in a collection.</a:documentation>
+            <value>canto</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">cantos or other major sections of a poem.</a:documentation>
+            <value>speaker</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">changes of speaker or narrator.</a:documentation>
+            <value>stanza</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">stanzas within a poem, book, or canto.</a:documentation>
+            <value>act</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">acts within a play.</a:documentation>
+            <value>scene</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">scenes within a play or act.</a:documentation>
+            <value>section</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">sections of any kind.</a:documentation>
+            <value>absent</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">passages not present in the reference edition.</a:documentation>
+            <value>unnumbered</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">passages present in the text, but not to be included as part of the reference.</a:documentation>
+            <data type="Name"/>
+         </choice>
+      </attribute>
+   </define>
    <define name="wwa-pforeign">
       <element name="foreign">
          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">(foreign) identifies a word or phrase as belonging to some language other than that of the surrounding text.  [3.3.2.1. ]</a:documentation>
@@ -2019,16 +2057,7 @@ Sample values include: 1] rubbing; 2] mildew; 3] smoke</a:documentation>
       <element name="add">
          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">(addition) contains letters, words, or phrases inserted in the source text by an author, scribe, annotator, or corrector. [3.4.3. ]</a:documentation>
          <ref name="wwa-pmacro.paraContent"/>
-         <ref name="wwa-patt.global.attribute.el-target"/>
-         <ref name="wwa-patt.global.attribute.att-target"/>
-         <ref name="wwa-patt.global.attribute.att-value"/>
-         <ref name="wwa-patt.global.attribute.xmlid"/>
-         <ref name="wwa-patt.global.attribute.n"/>
-         <ref name="wwa-patt.global.attribute.style"/>
-         <ref name="wwa-patt.global.linking.attribute.corresp"/>
-         <ref name="wwa-patt.global.linking.attribute.next"/>
-         <ref name="wwa-patt.global.linking.attribute.prev"/>
-         <ref name="wwa-patt.global.facs.attribute.facs"/>
+         <ref name="wwa-patt.global.attributes"/>
          <ref name="wwa-patt.transcriptional.attributes"/>
          <ref name="wwa-patt.placement.attributes"/>
          <ref name="wwa-patt.typed.attribute.subtype"/>
@@ -2425,33 +2454,11 @@ Suggested values include: 1] ordered; 2] bulleted; 3] simple; 4] gloss</a:docume
          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">marks a boundary point separating any kind of section of a text, typically but not necessarily indicating a point at which some part of a standard reference system changes, where the change is not represented by a structural element. [3.10.3. ]</a:documentation>
          <empty/>
          <ref name="wwa-patt.global.attributes"/>
+         <ref name="wwa-patt.milestoneUnit.attributes"/>
          <ref name="wwa-patt.typed.attributes"/>
          <ref name="wwa-patt.edition.attributes"/>
          <ref name="wwa-patt.spanning.attributes"/>
          <ref name="wwa-patt.breaking.attributes"/>
-         <attribute name="unit">
-            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-            <choice>
-               <value>tei:div</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:p</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:lg</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:date</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:speaker</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:q</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:stage</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:seg</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-               <value>tei:note</value>
-               <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"/>
-            </choice>
-         </attribute>
          <empty/>
       </element>
    </define>
@@ -3608,6 +3615,7 @@ The @spanTo attribute of <name/> is required.</assert>
                                         encoded, mod is not required.</sch:assert>
             </sch:rule>
          </pattern>
+         <ref name="wwa-patt.wwa.legacy.attributes"/>
          <ref name="wwa-patt.global.attributes"/>
          <ref name="wwa-patt.transcriptional.attributes"/>
          <ref name="wwa-patt.typed.attribute.subtype"/>

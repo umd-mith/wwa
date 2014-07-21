@@ -18,7 +18,7 @@ Apache 2.0 license: http://www.apache.org/licenses/LICENSE-2.0.html
   <xsl:param name="wrapper_parent" select="'body'"/>
   <xsl:param name="ns" select="'http://www.tei-c.org/ns/1.0'"/>
   <xsl:param name="wrapper_ns" select="'http://www.tei-c.org/ns/1.0'"/>
-  <xsl:param name="debug" select="false()"/>
+  <xsl:param name="keep" select="'true'"/>
   
   <xsl:variable name="wrap_ns" select="if ($wrapper_ns='')
     then root()/*[1]/namespace-uri()
@@ -55,10 +55,17 @@ Apache 2.0 license: http://www.apache.org/licenses/LICENSE-2.0.html
     <xsl:for-each-group select="current-group()"
       group-adjacent="generate-id((ancestor::* except $from/ancestor-or-self::*)[$level])">
       <xsl:variable name="copying" select="key('element-by-generated-id',current-grouping-key())"/>
-      <xsl:sequence select="current-group()[empty($copying)]"/>
+      <xsl:choose>
+        <xsl:when test="$keep='true'">
+          <xsl:sequence select="current-group()[empty($copying)]"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="current-group()[empty($copying)][not(self::*[local-name()=$milestone])]"/>
+        </xsl:otherwise>
+      </xsl:choose> 
       <xsl:for-each select="$copying">
         <xsl:copy>
-          <xsl:copy-of select="@* except @xml:id"/>
+          <xsl:copy-of select="@*"/>
           <xsl:call-template name="build">
             <xsl:with-param name="level" select="$level + 1"/>
           </xsl:call-template>

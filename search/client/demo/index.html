@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Search</title>
+<link href="../../css/reset.css" type="text/css" rel="stylesheet" />
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,300,700' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<script type="text/javascript" src="js/jquery.ba-bbq.min.js"></script>
+<script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/jquery.ba-bbq.min.js"></script>
+<link type="text/css" rel="stylesheet" href="http://spacely.unl.edu/wwa/css/main.css" media="all" />
+</head>
+
+<body class="page-search">
+<div id ="content-main" class="container_12 clearfix container container-fluid">
+  <div class="grid_12 grid_main">
+    <div id="main-content">
+      <div class="row">
+      <div class="search-collections col-md-10" id="search-collections">
+      <h1 class="title" id="page-title">Search - Walt Whitman's Annotations</h1>
+
+      <div class="row" id="search-header">
+        <div class="col-md-5 col-sm-6" id="search-bar">
+          <div class="input-group input-group-sm">
+              <label for="search-form" class="sr-only">Search</label>
+              <form><input type="text" class="form-control input-sm" placeholder="Search" /></form>
+            <span class="input-group-btn">
+              <a class="btn btn-default" title="Search" type="button"><i class="icon-search icon-flip-horizontal"></i></a>
+            </span>
+           </div>
+        </div>
+        <div class="col-md-7 col-sm-6" id="search-instructions">
+          <h4>How To Search</h4>
+          <p>Write a query in the search field. All words must be found on a page to be returned. Use <em>OR</em> between words to look for any of the words. Use inverted commas "" to look for word ocurring together.</p>
+        </div>
+      </div>
+      <!-- /search-header row -->      
+      <div id="all-results">
+        <div class="row r-header">
+          <div class="div-sep sep-single" style="margin-bottom: 2em;"></div>
+          <div class="col-sm-3 clearfix" id="results-refine-header">
+            <div class="results-refine-header clearfix">Refine Results</div>
+          </div>
+          <!--/col-->
+          <div class="col-sm-9 clearfix" id="results-info-sort">
+            <div class="results-info-sort clearfix">
+              <form class="form-inline">
+                <div class="r-qty pull-left num-results"><span class="badge">0</span> Results</div>
+                <div class="r-sorting pull-left">
+                  <div class="form-group">
+                    <label for="r-sorting" class="control-label">Sort:</label>
+                    <div class="input-group">
+                      <select class="form-control" name="r-sortby" size="1">
+                        <option value="score" selected="selected">Relevance</option>
+                        <option value="shelfmark">Alphabetical</option>
+                        <!-- <option value="date">Date</option> -->
+                      </select>
+                      <span class="input-group-addon"><i class="icon-caret-down"></i></span> </div>
+                    <div class="input-group">
+                      <select class="form-control" name="r-sort" size="1">
+                        <option value="asc" selected>Ascending</option>
+                        <option value="desc">Decending</option>
+                      </select>
+                      <span class="input-group-addon"><i class="icon-caret-down"></i></span> </div>
+                  </div>
+                </div>
+                <div class="r-nav pull-right">
+                  <ul class="pagination pagination-sm">
+                  </ul>
+                </div>
+              </form>
+            </div>
+            <!--/results-info-sort--> 
+          </div>
+          <!--/col--> 
+        </div>
+        <!--/r-header row-->
+        <div class="row">
+          <div class="col-xs-3 refine-results" id="refine-results"> 
+            <div class="panel" id="r-list-notebook">
+              <div class="panel-heading">Notebook</div>
+              <div class="list-group"> </div>
+            </div>
+            <!--/panel --> 
+            <div class="panel" id="r-list-hand">
+              <div class="panel-heading">Facets</div>
+              <div class="list-group"></div>
+            </div>
+            <!--/panel -->
+            <div class="panel" id="r-list-rev">
+              <div class="panel-heading">Revisions</div>
+              <div class="list-group"></div>
+            </div>
+            <!--/panel -->             
+          </div>
+          <div class="col-xs-9" id="usr-msg"> <span class="alert alert-info"></span> </div>
+          <div class="col-xs-9 results-grid" id="results-grid">
+            <div class="panel">
+              <ul class="media-list list-group">
+              </ul>
+            </div>
+            <!-- /panel --> 
+          </div>
+        </div>
+        <!--/row -->
+        <div class="row r-footer">
+          <div class="col-sm-9 col-sm-offset-3" id="results-info-sort">
+            <div class="results-info-sort clearfix">
+              <form class="form-inline">
+                <div class="r-qty pull-left num-results"><span class="badge">0</span> Results</div>
+                <div class="r-sorting pull-left">
+                  <div class="form-group">
+                    <label for="r-sorting" class="control-label">Sort:</label>
+                    <div class="input-group">
+                      <select class="form-control" name="r-sortby" size="1">
+                        <option value="score" selected="selected">Relevance</option>
+                        <option value="shelfmark">Alphabetical</option>
+                        <!-- <option value="date">Date</option> -->
+                      </select>
+                      <span class="input-group-addon"><i class="icon-caret-down"></i></span> </div>
+                    <div class="input-group">
+                      <select class="form-control" name="r-sort" size="1">
+                        <option value="asc" selected>Ascending</option>
+                        <option value="desc">Decending</option>
+                      </select>
+                      <span class="input-group-addon"><i class="icon-caret-down"></i></span> </div>
+                  </div>
+                </div>
+                <div class="r-nav pull-right">
+                  <ul class="pagination pagination-sm">
+                  </ul>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!--/results-info-sort--> 
+        </div>
+        <!--/r-footer row--> 
+      </div>
+      <!--/all-results--> 
+      
+      </div>
+      <!-- /SEARCH -->
+
+    <div class="browse-collections col-md-2" id="browse-collections">
+      <h1 class="title">Browse</h1>
+      <p style="font-size: 0.9em;">Access notebooks directly by browsing the collections below.</p>
+      <div class="div-sep sep-single" style="margin-top: 1em; margin-bottom: 2em;"></div>
+        <div class="panel-group" id="accordion">
+          <div class="panel panel-default">
+            <div class="panel-heading"><a data-toggle="collapse" data-parent="#accordion" href="#listings_duk"> Duke University </a></div>
+            <div id="listings_duk" class="panel-collapse collapse">
+                <div class="list-group">
+                  <a class="list-group-item" href="/wwa/?mf=duk.00055">duk.00055</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00086">duk.00086</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00106">duk.00106</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00107">duk.00107</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00109">duk.00109</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00110">duk.00110</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00111">duk.00111</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00144">duk.00144</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00169">duk.00169</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00170">duk.00170</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00171">duk.00171</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00172">duk.00172</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00173">duk.00173</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00174">duk.00174</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00175">duk.00175</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00176">duk.00176</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00177">duk.00177</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00178">duk.00178</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00179">duk.00179</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00180">duk.00180</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00182">duk.00182</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00184">duk.00184</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00185">duk.00185</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00188">duk.00188</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00189">duk.00189</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00191">duk.00191</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00192">duk.00192</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00193">duk.00193</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00194">duk.00194</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00195">duk.00195</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00196">duk.00196</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00197">duk.00197</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00198">duk.00198</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00200">duk.00200</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00201">duk.00201</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00248">duk.00248</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00642">duk.00642</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00673">duk.00673</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00674">duk.00674</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00677">duk.00677</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00678">duk.00678</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00679">duk.00679</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00680">duk.00680</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00681">duk.00681</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00682">duk.00682</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00683">duk.00683</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00684">duk.00684</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00685">duk.00685</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00686">duk.00686</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00687">duk.00687</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00692">duk.00692</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00705">duk.00705</a>
+                  <a class="list-group-item" href="/wwa/?mf=duk.00707">duk.00707</a>
+                </div>
+            </div>
+          </div>
+          <!-- /duk -->
+          <div class="panel panel-default">
+            <div class="panel-heading"><a data-toggle="collapse" data-parent="#accordion" href="#listings_loc"> Library of Congress </a></div>
+            <div id="listings_loc" class="panel-collapse collapse">
+                <div class="list-group">
+                  <a class="list-group-item" href="/wwa/?mf=loc.03398">loc.03398</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03399">loc.03399</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03400">loc.03400</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03401">loc.03401</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03402">loc.03402</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03403">loc.03403</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03404">loc.03404</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03405">loc.03405</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03407">loc.03407</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03408">loc.03408</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03409">loc.03409</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03410">loc.03410</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03411">loc.03411</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03412">loc.03412</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03413">loc.03413</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03415">loc.03415</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03418">loc.03418</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03419">loc.03419</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03420">loc.03420</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03421">loc.03421</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03423">loc.03423</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03424">loc.03424</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03425">loc.03425</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03426">loc.03426</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03428">loc.03428</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03429">loc.03429</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03430">loc.03430</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03434">loc.03434</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03435">loc.03435</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03436">loc.03436</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03437">loc.03437</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03440">loc.03440</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03441">loc.03441</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03442">loc.03442</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03445">loc.03445</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03449">loc.03449</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03450">loc.03450</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03456">loc.03456</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03782">loc.03782</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03784">loc.03784</a>
+                  <a class="list-group-item" href="/wwa/?mf=loc.03801">loc.03801</a>
+                </div>
+            </div>
+          </div>
+          <!-- /loc -->
+          <div class="panel panel-default">
+            <div class="panel-heading"><a data-toggle="collapse" data-parent="#accordion" href="#listings_nypl"> New York Public Library (NYPL) </a></div>
+            <div id="listings_nypl" class="panel-collapse collapse">
+                <div class="list-group">
+                    <a class="list-group-item" href="/wwa/?mf=nyp.00027">nyp.00027</a>
+                    <a class="list-group-item" href="/wwa/?mf=nyp.00030">nyp.00030</a>
+                    <a class="list-group-item" href="/wwa/?mf=nyp.00031">nyp.00031</a>
+                    <a class="list-group-item" href="/wwa/?mf=nyp.00035">nyp.00035</a>
+                    <a class="list-group-item" href="/wwa/?mf=nyp.00392">nyp.00392</a>
+                </div>
+            </div>
+          </div>
+          <!-- /nypl --> 
+        </div>
+      </div>
+      
+      <!-- /BROWSE -->
+      
+      
+      
+      
+    </div>
+    <!-- /main-content --> 
+  </div>
+  <!-- /grid-main--> 
+</div>
+<!--/#content-main--> 
+
+<script type="text/template" id="pagi-template">
+  <li>
+    <a href="#" class="nav-first <%= first %>"><i class="icon-red icon-step-backward"></i></a>
+  </li>
+  <li>
+    <a href="#" class="nav-prev <%= prev %>"><i class="icon-red icon-chevron-left"></i></a>
+  </li>
+  <% 
+    var start = 1;
+    var end = pages + 1;
+    if (pages > 3) {
+      start = Math.max(1, current - 1);
+      start = pages == current ? Math.max(1, current - 2) : start;
+      end = Math.min(end, start + 3);
+
+      if (current > 2) {
+        %><li><a class="dots">…</a></li><%
+      }
+    } 
+  %>
+  <% _.each(_.range(start,end), function(p){ %>
+    <li>
+    <a href="#" <% if (p == current) { %>
+      class="pg" 
+    <% } %> name="<%= p %>" >
+    <%= p %> 
+    <% if (p == current) { %>
+      <span class="sr-only">(current)</span>
+    <% } %> </a></li>
+  <% }); %>
+  <%  
+    if (pages > 3 && current < pages-1) {
+      %><li><a class="dots">…</a></li><%
+    }
+  %>
+  <li>
+    <a href="#" class="nav-next <%= next %>"><i class="icon-red icon-chevron-right"></i></a>
+  </li>
+  <li>
+    <a href="#" class="nav-last <%= last %>"><i class="icon-red icon-step-forward"></i></a>
+  </li>
+</script>
+
+<script type="text/template" id="facet-template">
+  <a href="#" class="list-group-item">
+    <span class="label label-danger"><i class="icon-remove"></i></span>
+    <span class="badge"><%= num %></span>
+    <%= name %>
+  </a>
+</script>
+
+<script type="text/template" id="result-template">
+  <li class="media list-group-item"> 
+    <span class="label label-info"><%= num %></span>
+    <div class="media-body">
+      <div class="r-description">
+      <a href="<%= viewer_url %><% if (detailQuery!='') { %><%=detailQuery%><% }%>
+    "> 
+        <span class="r-work"><%= work %></span> -
+        <span class="r-shelf_label"><%= shelf_label %></span>
+        (<span class="r-shelfmark"><%= shelfmark %></span>)
+        </a>
+      </div>
+      <div class="r-summary">
+        <% _.each(hls, function(i) { %>  <p>…<%= i %>…</p> <% }); %>
+      </div>
+    </div>
+  </li>
+</script>
+
+<script type="text/javascript" src="js/underscore-min.js"></script>
+<script type="text/javascript" src="js/backbone-min.js"></script>
+<script type="text/javascript" src="js/SGAsearch.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+
+</body>
+</html>
