@@ -20,13 +20,10 @@
         <xsl:copy>
             <xsl:attribute name="scribeRef">
                 <xsl:choose>
-                    <xsl:when test="@scribeRef">
-                        <xsl:value-of select="@scribeRef"/>
-                    </xsl:when>
-                    <xsl:when test="lower-case(@scribe)='walt_whitman'">
+                    <xsl:when test="lower-case(@scribe)='walt_whitman' or @scribeRef = '#ww'">
                         <xsl:text>#ww</xsl:text>
                     </xsl:when>
-                    <xsl:when test="lower-case(@scribe)='unknown'">
+                    <xsl:when test="lower-case(@scribe)='unknown' or @scribeRef = '#unk'">
                         <xsl:text>#unk</xsl:text>
                     </xsl:when>
                     <xsl:otherwise>

@@ -11,8 +11,19 @@
     <xsl:param name="destFolder" select="'.'"/>
     
     <xsl:template match='/'>
+        <xsl:apply-templates select="//tei:teiHeader"/>
         <xsl:apply-templates select="//tei:surface"/>
         <wwa:message>Done!</wwa:message>
+    </xsl:template>
+    
+    <xsl:template match="tei:teiHeader">
+        <xsl:result-document href="{$destFolder}/{//tei:TEI/@xml:id}-header.xml">
+            <xsl:copy>
+                
+                <xsl:apply-templates select="@*|node()" mode="splitting"/>                
+                
+            </xsl:copy>
+        </xsl:result-document>
     </xsl:template>
     
     <xsl:template match="tei:surface">

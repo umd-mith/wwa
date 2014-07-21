@@ -37,20 +37,20 @@
         
     </xsl:template>
         
-    <xsl:template match="tei:titlePage 
-                       | tei:docTitle 
-                       | tei:titlePart 
-                       | tei:byline 
-                       | tei:epigraph 
-                       | tei:cit
-                       | tei:quote
-                       | tei:bibl
-                       | tei:docImprint
-                       | tei:pubPlace
-                       | tei:docDate
-                       | tei:opener
-                       | tei:floatingText[@type='letter']
-                       | tei:body[parent::tei:floatingText[@type='letter']]">
+    <xsl:template match="tei:titlePage[ancestor::tei:text]
+                        | tei:docTitle[ancestor::tei:text]  
+                        | tei:titlePart[ancestor::tei:text] 
+                        | tei:byline[ancestor::tei:text] 
+                        | tei:epigraph[ancestor::tei:text] 
+                        | tei:cit[ancestor::tei:text]
+                        | tei:quote[ancestor::tei:text]
+                        | tei:bibl[ancestor::tei:text]
+                        | tei:docImprint[ancestor::tei:text]
+                        | tei:pubPlace[ancestor::tei:text]
+                        | tei:docDate[ancestor::tei:text]
+                        | tei:opener[ancestor::tei:text]
+                        | tei:floatingText[@type='letter']
+                        | tei:body[parent::tei:floatingText[@type='letter']]">
        <xsl:apply-templates select="node()"/>
     </xsl:template>    
     
@@ -111,6 +111,15 @@
                 </xsl:choose>
             </xsl:for-each>
         </xsl:copy>
+    </xsl:template>
+    
+    <!-- Change add place values for overwritten text to conform with SGA -->
+    <xsl:template match="tei:add[@rend='overwrite']">
+        <xsl:copy>
+            <xsl:attribute name="place" select="'intralinear'"/>
+            <xsl:apply-templates select="@* except @place except @rend|node()"></xsl:apply-templates>
+        </xsl:copy>
+            
     </xsl:template>
     
 </xsl:stylesheet>
